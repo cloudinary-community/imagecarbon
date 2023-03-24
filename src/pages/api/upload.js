@@ -1,4 +1,4 @@
-import { getCloudinary } from '@lib/cloudinary';
+import { getCloudinary } from '@/lib/cloudinary';
 
 const cloudinary = getCloudinary();
 
@@ -6,7 +6,7 @@ export default async function handler(req, res) {
   const { data: imageData } = JSON.parse(req.body);
 
   const results = await cloudinary.uploader.upload(imageData, {
-    folder: 'earthday'
+    folder: 'imagecarbon'
   });
 
   const data = ['public_id', 'secure_url', 'width', 'height'].reduce((prev, key) => {
