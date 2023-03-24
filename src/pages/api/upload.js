@@ -1,4 +1,4 @@
-import { getCloudinary } from '@/lib/cloudinary';
+import { getCloudinary } from '@/lib/cloudinary-server';
 
 const cloudinary = getCloudinary();
 

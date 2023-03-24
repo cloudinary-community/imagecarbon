@@ -1,0 +1,6 @@
+{
+  "databaseURL": "https://ImageCarbon-hm2i7i.us-east-1.xata.sh/db/sites",
+  "codegen": {
+    "output": "src/lib/xata.ts"
+  }
+}

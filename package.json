@@ -12,6 +12,7 @@
     "@cloudinary-util/url-loader": "^3.0.0",
     "@cloudinary-util/util": "^2.0.0",
     "@tgwf/co2": "^0.12.2",
+    "@xata.io/client": "^0.23.3",
     "cloudinary": "^1.35.0",
     "eslint": "8.36.0",
     "eslint-config-next": "13.2.4",
@@ -20,6 +21,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-icons": "^4.8.0",
-    "sass": "^1.59.3"
+    "sass": "^1.59.3",
+    "swr": "^2.1.1"
   }
 }

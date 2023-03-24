@@ -31,12 +31,8 @@ export default async function handler(req, res) {
       url = `${siteUrl}${url}`;
     }
 
-    const imageResponse = await fetch(url);
-    const { size } = await imageResponse.blob();
-
     return {
       url,
-      size,
       loading
     }
   }));

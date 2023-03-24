@@ -18,3 +18,12 @@ export function restoreUrl(url) {
   }
   return url;
 }
+
+/**
+ * getFileSize
+ */
+
+export async function getFileSize(url) {
+  const data = await fetch(url).then(r => r.blob());
+  return data.size;
+}

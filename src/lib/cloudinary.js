@@ -1,19 +1,41 @@
-const cloudinary = require('cloudinary').v2;
+import { parseUrl } from '@cloudinary-util/util';
+import { constructCloudinaryUrl } from '@cloudinary-util/url-loader';
 
-cloudinary.config({
-  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-  secure: true
-});
+/**
+ * isCloudinaryUrl
+ */
 
-export function getCloudinary() {
-  return cloudinary;
+export function isCloudinaryUrl(url) {
+  return url.startsWith('https://res.cloudinary.com');
 }
 
-export function getSignedImageUrl(publicId, options = {}) {
-  return cloudinary.url(publicId, {
-    sign_url: true,
-    ...options
-  })
+/**
+ * normalizeCloudinaryUrl
+ */
+
+export function normalizeCloudinaryUrl(url, overrides = {}) {
+  const parts = parseUrl(url);
+
+  const options = {
+    assetType: parts?.assetType,
+    deliveryType: parts?.deliveryType,
+    rawTransformations: parts?.transformations,
+    signature: parts?.signature,
+    src: parts?.publicId,
+    version: parts?.version,
+    ...overrides
+  }
+
+  if ( parts?.seoSuffix ) {
+    options.seoSuffix = 'imagecarbon'; // Avoid any errors with unsual suffixes
+  }
+
+  return constructCloudinaryUrl({
+    options,
+    config: {
+      cloud: {
+        cloudName: parts?.cloudName
+      }
+    }
+  });
 }

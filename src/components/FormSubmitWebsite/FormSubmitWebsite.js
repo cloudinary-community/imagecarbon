@@ -20,6 +20,7 @@ const FormSubmitWebsite = ({ className, ...rest }) => {
 
   function handleOnSubmit(e) {
     e.preventDefault();
+    
     const fields = Array.from(e.currentTarget.elements);
     const values = fields.filter(({ name }) => !!name).map(field => {
       return {
