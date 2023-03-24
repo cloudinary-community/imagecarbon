@@ -9,10 +9,16 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@cloudinary-util/url-loader": "^3.0.0",
+    "@tgwf/co2": "^0.12.2",
+    "cloudinary": "^1.35.0",
     "eslint": "8.36.0",
     "eslint-config-next": "13.2.4",
     "next": "13.2.4",
+    "next-cloudinary": "^4.0.1",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "react-icons": "^4.8.0",
+    "sass": "^1.59.3"
   }
 }

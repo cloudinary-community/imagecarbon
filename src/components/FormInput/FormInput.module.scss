@@ -1,0 +1,27 @@
+@import "@/styles/settings/_settings";
+
+.formInput {
+
+  display: inline-block;
+  font-size: 1em;
+  padding: 1em 1.4em;
+  border: solid 2px $color-brand-gray-light;
+  border-radius: .2em;
+  background: white;
+  box-shadow: 0 2px 10px rgba($color-brand-gray-darker, .8);
+  outline: none;
+
+  &:focus {
+    border: solid 2px $color-primary;
+    box-shadow: 0 2px 10px rgba($color-primary, .6);
+  }
+
+  &:hover {
+    background: white;
+  }
+
+  &::placeholder {
+    color: darken($color-brand-gray-light, 15);
+  }
+
+}

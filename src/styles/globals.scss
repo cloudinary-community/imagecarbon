@@ -1,0 +1,63 @@
+@import "@/styles/settings/_settings";
+
+html,
+body {
+  color: $color-text-body;
+  background-color: $color-brand-gray-dark;
+  padding: 0;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration-thickness: 2px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+h1,
+h2,
+h3 {
+  color: $color-text-headline;
+}
+
+h1,
+h2 {
+
+  strong {
+    color: $color-text-accent;
+  }
+
+}
+
+h1 {
+  font-size: 3.8em;
+  line-height: 1.2;
+}
+
+p {
+  line-height: 1.4;
+}
+
+img {
+  border-radius: .2em;
+  border: solid 2px $color-brand-gray-light;
+  box-shadow: 0 2px 10px rgba($color-brand-gray-darker, .8);
+}
+
+.sr-only {
+  display: block;
+  overflow: hidden;
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+  width: 0;
+  height: 0;
+}

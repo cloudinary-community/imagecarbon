@@ -1,0 +1,38 @@
+@import "@/styles/settings/_settings";
+
+.SectionDescription {
+
+  font-size: 2em;
+  font-weight: $text-weight-normal;
+  text-align: center;
+
+  strong {
+    color: $color-primary;
+    font-weight: inherit;
+  }
+
+  @media (min-width: $breakpoint-xlarge) {
+    padding: 0 3em;  
+  }
+
+  &[data-text-size="small"] {
+    font-size: 1.8em;
+  }
+
+  &[data-text-color="white"] {
+    color: white;
+  }
+
+  &[data-text-weight="semibold"] {
+    font-weight: semibold;
+  }
+
+  &[data-text-weight="bold"] {
+    font-weight: bold;
+  }
+
+  &[data-text-weight="black"] {
+    font-weight: black;
+  }
+
+}
