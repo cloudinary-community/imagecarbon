@@ -20,7 +20,7 @@ export default async function handler(req, res) {
   // Create an array of the images with a full URL and the size
 
   const images = results?.images && await Promise.all(results.images.map(async (image) => {
-    const { src } = image;
+    const { src, loading } = image;
 
     let url = src;
 
@@ -35,9 +35,9 @@ export default async function handler(req, res) {
     const { size } = await imageResponse.blob();
 
     return {
-      ...image,
       url,
-      size
+      size,
+      loading
     }
   }));
 

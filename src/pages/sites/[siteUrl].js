@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Head from 'next/head'
 import { CldImage } from 'next-cloudinary'
 import { constructCloudinaryUrl } from '@cloudinary-util/url-loader';
+import { parseUrl } from '@cloudinary-util/util';
 import { co2, hosting } from '@tgwf/co2';
 import { FaTree } from 'react-icons/fa';
 
@@ -19,6 +20,33 @@ import Button from '@/components/Button';
 import styles from '@/styles/Site.module.scss'
 
 const emissions = new co2();
+
+function normalizeCloudinaryUrl(url, overrides = {}) {
+  const parts = parseUrl(url);
+
+  const options = {
+    assetType: parts?.assetType,
+    deliveryType: parts?.deliveryType,
+    rawTransformations: parts?.transformations,
+    signature: parts?.signature,
+    src: parts?.publicId,
+    version: parts?.version,
+    ...overrides
+  }
+
+  if ( parts?.seoSuffix ) {
+    options.seoSuffix = 'imagecarbon'; // Avoid any errors with unsual suffixes
+  }
+
+  return constructCloudinaryUrl({
+    options,
+    config: {
+      cloud: {
+        cloudName: parts?.cloudName
+      }
+    }
+  });
+}
 
 export default function Site({ siteUrl, meta = {} }) {
   const { isGreenHost = false, screenshotUrl } = meta;
@@ -43,33 +71,50 @@ export default function Site({ siteUrl, meta = {} }) {
       try {
         // First grab all of the images from the passed in URL
 
-        const { images } = await fetch('/api/scrape', {
+        const { images: defaultImages } = await fetch('/api/scrape', {
           method: 'POST',
           body: JSON.stringify({
             siteUrl
           })
         }).then(r => r.json());
 
+        const images = defaultImages.map(image => {
+          if ( image.url.startsWith('https://res.cloudinary.com') ) {
+            image.url = normalizeCloudinaryUrl(image.url);
+          }
+          return image;
+        })
+
         setSiteImages(images);
 
         // Loop through all images and get the file size of the Cloudinary version
 
         const optimizedImages = await Promise.all(images.map(async (image) => {
-          const cloudinaryUrl = constructCloudinaryUrl({
-            options: {
-              width: 960,
-              height: 540,
-              crop: 'fill',
-              gravity: 'center',
-              src: image.url,
-              deliveryType: 'fetch'
-            },
-            config: {
-              cloud: {
-                cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+          let cloudinaryUrl;
+
+          const imageOptions = {
+            width: 800,
+            height: 600,
+            crop: 'fill',
+            gravity: 'center',
+          }
+
+          if ( image.url.startsWith('https://res.cloudinary.com') ) {
+            cloudinaryUrl = normalizeCloudinaryUrl(image.url, imageOptions);
+          } else {
+            cloudinaryUrl = constructCloudinaryUrl({
+              options: {
+                ...imageOptions,
+                src: image.url,
+                deliveryType: 'fetch'
+              },
+              config: {
+                cloud: {
+                  cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+                }
               }
-            }
-          });
+            });
+          }
 
           const data = await fetch(cloudinaryUrl).then(r => r.blob())
 
@@ -123,8 +168,8 @@ export default function Site({ siteUrl, meta = {} }) {
             <figure className={styles.previewImage}>
               {screenshotUrl && (
                 <img
-                  width="960"
-                  height="540"
+                  width="800"
+                  height="600"
                   // crop="fill"
                   src={screenshotUrl}
                   alt={`${siteUrl} Screenshot`}
@@ -221,13 +266,22 @@ export default function Site({ siteUrl, meta = {} }) {
           </SectionTitle>
           
           <SectionDescription size="small">
-            Note: Images may appear cropped for display purposes only. Results are based on original full-sized images.
+            Note: Images may appear cropped and optimized for display purposes only. Results are based on original full-sized images.
           </SectionDescription>
           
           <ul className={styles.breakdownImages}>
             {siteImages && siteImages.map(siteImage => {
               const estimatedSizeSavings = Math.ceil((siteImage.size - siteImage.optimizedSize) / 1000);
               const estimatedCarbonSavings = emissions.perByte(siteImage.size - siteImage.optimizedSize, isGreenHost).toFixed(3);
+
+              const imageSettings = {
+                src: siteImage.url
+              };
+
+              if ( !imageSettings.src.startsWith('https://res.cloudinary.com') ) {
+                imageSettings.deliveryType = 'fetch';
+              }
+
               return (
                 <li key={siteImage.url}>
                   <p className={styles.breakdownUrl}>
@@ -235,16 +289,16 @@ export default function Site({ siteUrl, meta = {} }) {
                   </p>
                   <div className={styles.breakdownImage}>
                     <div className={styles.breakdownVersions}>
-                      <div className={styles.breakdownOriginal}>
-                        <span>
-                          <img
-                            width="960"
-                            height="540"
-                            src={siteImage.url}
-                            alt={`Original Image`}
-                            loading="lazy"
-                          />
-                        </span>
+                      <div>
+                        <CldImage
+                          {...imageSettings}
+                          width="800"
+                          height="600"
+                          crop="fill"
+                          gravity="center"
+                          alt={`Original image optimized showing text-based results`}
+                          loading="lazy"
+                        />
                         <p>
                           Size: { siteImage.size && Math.ceil(siteImage.size / 1000) }kb
                         </p>
@@ -254,13 +308,13 @@ export default function Site({ siteUrl, meta = {} }) {
                       </div>
                       <div>
                         <CldImage
-                          width="960"
-                          height="540"
+                          {...imageSettings}
+                          width="800"
+                          height="600"
                           crop="fill"
                           gravity="center"
-                          src={siteImage.url}
-                          deliveryType="fetch"
-                          alt={`Optimized Image`}
+                          alt={`Optimized image showing results`}
+                          loading="lazy"
                         />
                         <p>
                           Size: { siteImage.optimizedSize && Math.ceil(siteImage.optimizedSize / 1000) }kb
@@ -308,7 +362,8 @@ export async function getStaticProps({ params }) {
 
   try {
     // Hosting requires domain without protocol or trailing slash
-    isGreenHost = await hosting.check(cleanUrl(siteUrl));
+    const siteHost = cleanUrl(siteUrl).split('/')?.[0];
+    isGreenHost = await hosting.check(siteHost);
   } catch(e) {
     console.log(`Failed to check host status: ${e.message}`);
   }
