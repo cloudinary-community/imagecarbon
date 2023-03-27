@@ -19,7 +19,11 @@ export default async function handler(req, res) {
 
   // Create an array of the images with a full URL and the size
 
-  const images = results?.images && await Promise.all(results.images.map(async (image) => {
+  let images = results?.images
+    .filter(({ src }) => !!src)
+    .filter(({ src }) => !src.includes('data:image/'));
+
+  images = images && await Promise.all(images.map(async (image) => {
     const { src, loading } = image;
 
     let url = src;
