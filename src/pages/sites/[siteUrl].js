@@ -58,95 +58,24 @@ export default function Site({ siteUrl, meta = {} }) {
         });
 
         images = images.map(image => {
-          let url = image.url;
-          if ( isCloudinaryUrl(url) ) {
-            url = normalizeCloudinaryUrl(url);
-          }
           return {
             original: {
-              url
+              url: image.url
             }
           };
         });
 
         setSiteImages(images);
 
-        // Get the size and carbon of all of the scraped images first
-
-        const originalResults = await fetch('/api/calculate', {
+        const { images: imagesResults } = await fetch('/api/collect', {
           method: 'POST',
           body: JSON.stringify({
-            images: images.map(({ original }) => original.url)
+            images: images.map(({ original }) => original.url),
+            siteUrl
           })
         }).then(r => r.json());
 
-        images = images.map(image => {
-          const { size, co2 } = originalResults.images.find(({ url }) => url === image.original.url);
-          return {
-            ...image,
-            original: {
-              ...image.original,
-              size,
-              co2
-            }
-          }
-        })
-
-        setSiteImages(images);
-
-        // Loop through all images and get the file size of the Cloudinary version
-
-        images = await Promise.all(images.map(async (image) => {
-          let url;
-
-          if ( isCloudinaryUrl(image.original.url) ) {
-            url = normalizeCloudinaryUrl(image.original.url);
-          } else {
-            url = constructCloudinaryUrl({
-              options: {
-                src: image.original.url,
-                deliveryType: 'fetch'
-              },
-              config: {
-                cloud: {
-                  cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
-                }
-              }
-            });
-          }
-
-          return {
-            ...image,
-            optimized: {
-              url,
-            }
-          }
-        }));
-
-        setSiteImages(images);
-
-        // Get the size and carbon of all of the optimized images
-
-        const optimizedResults = await fetch('/api/calculate', {
-          method: 'POST',
-          body: JSON.stringify({
-            images: images.map(({ optimized }) => optimized.url)
-          })
-        }).then(r => r.json());
-
-        images = images.map(image => {
-          const { size, co2 } = optimizedResults.images.find(({ url }) => url === image.optimized.url);
-          return {
-            ...image,
-            optimized: {
-              ...image.optimized,
-              size,
-              co2
-            }
-          }
-        });
-
-        setSiteImages(images);
+        setSiteImages(imagesResults);
 
         setIsLoading(false);
       } catch(e) {
@@ -166,6 +95,12 @@ export default function Site({ siteUrl, meta = {} }) {
 
       <Section>
         <Container className={styles.siteContainer} size="narrow">
+          {isLoading && (
+            <SectionDescription color="white" weight="bold">
+              ⚠️ Loading
+            </SectionDescription>
+          )}
+
           <SectionDescription color="white" weight="semibold" size="small">
             Your website produced <strong>{ totalCo2Original?.toFixed(3) }g</strong> of carbon from images alone.
           </SectionDescription>
@@ -286,15 +221,7 @@ export default function Site({ siteUrl, meta = {} }) {
           <ul className={styles.breakdownImages}>
             {siteImages && siteImages.map(siteImage => {
               const estimatedSizeSavings = Math.ceil((siteImage.original?.size - siteImage.optimized?.size) / 1000);
-              const estimatedCarbonSavings = emissions.perByte(siteImage.original?.size - siteImage.optimized?.size, isGreenHost).toFixed(3);
-
-              const imageSettings = {
-                src: siteImage?.original.url
-              };
-
-              if ( !imageSettings.src.startsWith('https://res.cloudinary.com') ) {
-                imageSettings.deliveryType = 'fetch';
-              }
+              const estimatedCarbonSavings = Math.ceil((siteImage.original?.co2 - siteImage.optimized?.co2) / 1000);
 
               return (
                 <li key={siteImage?.original.url}>
@@ -304,37 +231,43 @@ export default function Site({ siteUrl, meta = {} }) {
                   <div className={styles.breakdownImage}>
                     <div className={styles.breakdownVersions}>
                       <div>
-                        <CldImage
-                          {...imageSettings}
-                          width="800"
-                          height="600"
-                          crop="fill"
-                          gravity="center"
-                          alt={`Original image optimized showing text-based results`}
-                          loading="lazy"
-                        />
+                        {siteImage?.uploaded?.url && (
+                          <CldImage
+                            key={siteImage.uploaded.url}
+                            src={siteImage.uploaded.url}
+                            width="800"
+                            height="600"
+                            crop="fill"
+                            gravity="center"
+                            alt={`Original image optimized showing text-based results`}
+                            loading="lazy"
+                          />
+                        )}
                         <p>
                           Size: { siteImage.original?.size && Math.ceil(siteImage.original?.size / 1000) }kb
                         </p>
                         <p>
-                          Carbon: { emissions.perByte(siteImage.original?.size, isGreenHost).toFixed(3) }g
+                          Carbon: { siteImage.original?.co2?.toFixed(3) }g
                         </p>
                       </div>
                       <div>
-                        <CldImage
-                          {...imageSettings}
-                          width="800"
-                          height="600"
-                          crop="fill"
-                          gravity="center"
-                          alt={`Optimized image showing results`}
-                          loading="lazy"
-                        />
+                        {siteImage?.optimized?.url && (
+                          <CldImage
+                            key={siteImage.optimized.url}
+                            src={siteImage.optimized.url}
+                            width="800"
+                            height="600"
+                            crop="fill"
+                            gravity="center"
+                            alt={`Optimized image showing results`}
+                            loading="lazy"
+                          />
+                        )}
                         <p>
                           Size: { siteImage.optimized?.size && Math.ceil(siteImage.optimized?.size / 1000) }kb
                         </p>
                         <p>
-                          Carbon: { emissions.perByte(siteImage.optimized?.size, isGreenHost).toFixed(3) }g
+                          Carbon: { siteImage.optimized?.co2?.toFixed(3) }g
                         </p>
                       </div>
                     </div>
