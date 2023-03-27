@@ -1,0 +1,1 @@
+export const SCRAPING_CACHE_TIME = 1 * 24 * 60 * 60 * 1000; // 1 Day

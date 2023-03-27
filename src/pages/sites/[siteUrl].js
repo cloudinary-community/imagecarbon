@@ -1,13 +1,10 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head'
 import { CldImage } from 'next-cloudinary'
-import { constructCloudinaryUrl } from '@cloudinary-util/url-loader';
 
-import { co2, hosting } from '@tgwf/co2';
 import { FaTree } from 'react-icons/fa';
 
-import { cleanUrl, restoreUrl, getFileSize } from '@/lib/util';
-import { isCloudinaryUrl, normalizeCloudinaryUrl } from '@/lib/cloudinary';
+import { cleanUrl, restoreUrl } from '@/lib/util';
 import { getSignedImageUrl } from '@/lib/cloudinary-server';
 import { scrapeImagesFromWebsite } from '@/lib/scraping';
 
@@ -21,14 +18,12 @@ import Button from '@/components/Button';
 
 import styles from '@/styles/Site.module.scss'
 
-const emissions = new co2();
-
 function addNumbers(sizes = []) {
   return sizes.reduce((prev, curr) => prev + curr, 0);
 }
 
 export default function Site({ siteUrl, meta = {} }) {
-  const { isGreenHost = false, screenshotUrl } = meta;
+  const { screenshotUrl } = meta;
 
   const [siteImages, setSiteImages] = useState();
   const [isLoading, setIsLoading] = useState(false);
@@ -51,11 +46,35 @@ export default function Site({ siteUrl, meta = {} }) {
       try {
         setIsLoading(true);
 
+        console.log(`Begin scraping ${siteUrl}...`);
+
+        const { images: cachedImages } = await fetch(`/api/sites/cache?url=${siteUrl}`).then(r => r.json());
+
+        if ( cachedImages ) {
+          console.log(`Cache found! Restoring ${cachedImages.length} images.`)
+
+          const images = cachedImages.map(image => {
+            return {
+              ...image,
+              optimized: JSON.parse(image.optimized),
+              original: JSON.parse(image.original),
+              uploaded: JSON.parse(image.uploaded)
+            }
+          });
+          
+          setSiteImages(images);
+          setIsLoading(false);
+
+          return;
+        }
+
         // First grab all of the images from the passed in URL
 
         let { images } = await scrapeImagesFromWebsite({
           siteUrl
         });
+
+        console.log(`Found ${images.length} images.`)
 
         images = images.map(image => {
           return {
@@ -75,11 +94,23 @@ export default function Site({ siteUrl, meta = {} }) {
           })
         }).then(r => r.json());
 
+        console.log(`Collected image data and emissions results.`)
+
         setSiteImages(imagesResults);
 
         setIsLoading(false);
+
+        await fetch('/api/sites/add', {
+          method: 'POST',
+          body: JSON.stringify({
+            images: imagesResults,
+            siteUrl
+          })
+        }).then(r => r.json());
+
+        console.log(`Added site to cache for next time!`)
       } catch(e) {
-        console.log('e', e);
+        console.log(`Something went wrong! ${e.message}`);
       }
     })();
   }, []);
@@ -305,16 +336,6 @@ export async function getStaticProps({ params }) {
 
   siteUrl = restoreUrl(siteUrl);
 
-  let isGreenHost = false;
-
-  try {
-    // Hosting requires domain without protocol or trailing slash
-    const siteHost = cleanUrl(siteUrl).split('/')?.[0];
-    isGreenHost = await hosting.check(siteHost);
-  } catch(e) {
-    console.log(`Failed to check host status: ${e.message}`);
-  }
-
   const screenshotUrl = getSignedImageUrl(siteUrl, {
     type: 'url2png',
     gravity: 'north',
@@ -325,10 +346,8 @@ export async function getStaticProps({ params }) {
 
   return {
     props: {
-
       siteUrl,
       meta: {
-        isGreenHost,
         screenshotUrl
       }
     }
