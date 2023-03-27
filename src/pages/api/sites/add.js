@@ -19,7 +19,7 @@ export default async function handler(req, res) {
       fuzziness: 0
     });
 
-    const site = records?.[0].record;
+    const site = records?.[0]?.record;
 
     // If it does, first clear all existing images being stored with it
 
@@ -69,7 +69,7 @@ export default async function handler(req, res) {
     });
   } catch(e) {
     console.log('e', e)
-    console.log(`Failed to collect image assets: ${e.message}`);
+    console.log(`Failed to add site: ${e.message}`);
     res.status(500).json({
       error: e.message
     })

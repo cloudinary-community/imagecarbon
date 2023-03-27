@@ -16,7 +16,7 @@ export default async function handler(req, res) {
       fuzziness: 0
     });
 
-    const site = records?.[0].record;
+    const site = records?.[0]?.record;
     const shouldRefresh = site && new Date(Date.now()) > new Date(site.dateCollected).getTime() + SCRAPING_CACHE_TIME;
 
     if ( !site || shouldRefresh ) {
@@ -32,7 +32,7 @@ export default async function handler(req, res) {
       images
     });
   } catch(e) {
-    console.log(`Failed to collect image assets: ${e.message}`);
+    console.log(`Failed to get cache: ${e.message}`);
     res.status(500).json({
       error: e.message
     })
