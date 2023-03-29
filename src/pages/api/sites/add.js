@@ -1,7 +1,5 @@
-import { getXataClient } from '@/lib/xata';
 import { cleanUrl } from '@/lib/util';
-
-const xata = getXataClient();
+import { getSiteByUrl, updateSiteById, createSite, getImagesBySiteUrl, deleteImagesById, addImages } from '@/lib/sites';
 
 export default async function handler(req, res) {
   const body = JSON.parse(req.body);
@@ -12,17 +10,15 @@ export default async function handler(req, res) {
 
     // Look up to see if the site exists in the table
 
-    const records = await xata.db.Sites.filter({ siteUrl }).getAll();
-
-    const site = records?.[0]?.record;
+    const site = await getSiteByUrl(siteUrl)
 
     // If it does, first clear all existing images being stored with it
 
-    const existingImages = await xata.db.Images.filter({ siteUrl }).getAll();
+    const existingImages = await getImagesBySiteUrl(siteUrl);
 
     const existingImageIds = existingImages.map(({ id }) => id);
 
-    await xata.db.Images.delete(existingImageIds);
+    await deleteImagesById(existingImageIds);
 
     // Then collect the new images to be stored
 
@@ -37,7 +33,7 @@ export default async function handler(req, res) {
       }
     });
 
-    await xata.db.Images.create(imageRecords);
+    await addImages(imageRecords);
 
     // Finally, we want to add the site or update the date collection reference
 
@@ -45,13 +41,13 @@ export default async function handler(req, res) {
 
     if ( site ) {
       // If the site exists, we just want to update the Date Collected record
-      await xata.db.Sites.update(site.id, {
+      await updateSiteById(site.id, {
         siteUrl,
         dateCollected,
       });
     } else {
       // Otherwise we want to create the site
-      await xata.db.Sites.create({
+      await createSite({
         siteUrl,
         dateCollected
       });

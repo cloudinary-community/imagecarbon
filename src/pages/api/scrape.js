@@ -1,7 +1,12 @@
 import { scrapingBeeRequest } from '@/lib/scrapingbee';
+import { cleanUrl } from '@/lib/util';
 
-export default async function handler(req, res) {
-  const { siteUrl } = JSON.parse(req.body);
+export const config = {
+  runtime: 'edge',
+}
+
+export default async function handler(res) {
+	const { siteUrl } = await res.json();
 
   try {
     const results = await scrapingBeeRequest({
@@ -42,13 +47,29 @@ export default async function handler(req, res) {
       }
     }));
 
-    res.status(200).json({
-      images
-    });
+    return new Response(
+      JSON.stringify({
+        images
+      }),
+      {
+        status: 200,
+        headers: {
+          'content-type': 'application/json',
+        },
+      }
+    );
   } catch(e) {
-    console.log(`[${cleanUrl(body.siteUrl)}] Failed to scrape website: ${e.message}`);
-    res.status(500).json({
-      error: e.message
-    })
+    console.log(`[${cleanUrl(siteUrl)}] Failed to scrape website: ${e.message}`);
+    return new Response(
+      JSON.stringify({
+        error: e.message
+      }),
+      {
+        status: 500,
+        headers: {
+          'content-type': 'application/json',
+        },
+      }
+    );
   }
 }
