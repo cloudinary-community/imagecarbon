@@ -17,6 +17,8 @@ export default async function handler(req, res) {
   const { images } = body;
   const siteUrl = cleanUrl(body.siteUrl);
 
+  console.log('images', images)
+
   try {
     const imagesQueue = images.map(image => {
       return limit(() => {

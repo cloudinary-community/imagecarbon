@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useRouter } from 'next/router';
 
 import { cleanUrl } from '@/lib/util';
@@ -12,6 +13,8 @@ import styles from './FormSubmitWebsite.module.scss';
 const FormSubmitWebsite = ({ className, ...rest }) => {
   const router = useRouter();
 
+  const [isLoading, setIsLoading] = useState();
+
   let formClassName = styles.formSubmitWebsite;
 
   if ( className ) {
@@ -20,6 +23,8 @@ const FormSubmitWebsite = ({ className, ...rest }) => {
 
   function handleOnSubmit(e) {
     e.preventDefault();
+
+    setIsLoading(true);
     
     const fields = Array.from(e.currentTarget.elements);
     const values = fields.filter(({ name }) => !!name).map(field => {
@@ -48,7 +53,7 @@ const FormSubmitWebsite = ({ className, ...rest }) => {
         <FormInput type="text" name="url" placeholder="mywebsite.com" />
       </FormRow>
       <FormRow>
-        <Button>Calculate Emissions</Button>
+        <Button disabled={isLoading}>Calculate Emissions</Button>
       </FormRow>
     </Form>
   );

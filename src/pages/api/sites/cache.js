@@ -9,12 +9,7 @@ export default async function handler(req, res) {
   const siteUrl = cleanUrl(req.query.url);
   
   try {
-    const records = await xata.search.all(siteUrl, {
-      tables: [
-        { table: "Sites", target: [{ column: "siteUrl" }] },
-      ],
-      fuzziness: 0
-    });
+    const records = await xata.db.Sites.filter({ siteUrl }).getAll();
 
     const site = records?.[0]?.record;
     const shouldRefresh = site && new Date(Date.now()) > new Date(site.dateCollected).getTime() + SCRAPING_CACHE_TIME;

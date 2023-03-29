@@ -11,13 +11,8 @@ export default async function handler(req, res) {
   try {
 
     // Look up to see if the site exists in the table
-    
-    const records = await xata.search.all(siteUrl, {
-      tables: [
-        { table: "Sites", target: [{ column: "siteUrl" }] },
-      ],
-      fuzziness: 0
-    });
+
+    const records = await xata.db.Sites.filter({ siteUrl }).getAll();
 
     const site = records?.[0]?.record;
 

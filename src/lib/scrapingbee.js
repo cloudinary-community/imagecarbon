@@ -7,6 +7,7 @@ export async function scrapingBeeRequest({ url, extractRules }) {
     api_key: process.env.SCRAPINGBEE_API_KEY,
     url,
     extract_rules: JSON.stringify(),
+    wait: '1000',
   };
 
   if ( extractRules) {
