@@ -1,14 +1,14 @@
 import { getXataClient } from '@/lib/xata';
-
 import { cleanUrl } from '@/lib/util';
 
 const xata = getXataClient();
 
 export default async function handler(req, res) {
+  const body = JSON.parse(req.body);
+  const { images } = body;
+  const siteUrl = cleanUrl(body.siteUrl);
+  
   try {
-    const body = JSON.parse(req.body);
-    const { images } = body;
-    const siteUrl = cleanUrl(body.siteUrl);
 
     // Look up to see if the site exists in the table
     
@@ -23,9 +23,7 @@ export default async function handler(req, res) {
 
     // If it does, first clear all existing images being stored with it
 
-    const existingImages = await xata.db.Images.filter({
-      siteUrl
-    }).getMany();
+    const existingImages = await xata.db.Images.filter({ siteUrl }).getAll();
 
     const existingImageIds = existingImages.map(({ id }) => id);
 
@@ -68,8 +66,7 @@ export default async function handler(req, res) {
       images
     });
   } catch(e) {
-    console.log('e', e)
-    console.log(`Failed to add site: ${e.message}`);
+    console.log(`[${siteUrl}] Failed to add site: ${e.message}`);
     res.status(500).json({
       error: e.message
     })

@@ -5,10 +5,19 @@
 }
 
 .preview {
+  
   display: flex;
   justify-content: center;
+  align-items: center;
+  flex-direction: column;
   max-width: 50em;
   margin: 4em auto 0;
+
+  @media (min-width: $breakpoint-huge) {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
 }
 
 .previewImage {
@@ -43,8 +52,34 @@
 
 .previewStats {
 
+  display: flex;
+  flex-direction: row;
   color: white;
   text-align: left;
+  margin-top: 2em;
+
+  @media (min-width: $breakpoint-huge) {
+    flex-direction: column;
+    margin-top: 0;
+  }
+
+  div {
+
+    margin: 0 1.5em;
+
+    &:first-child {
+      margin-left: 0;
+    }
+
+    &:last-child {
+      margin-right: 0;
+    }
+
+    @media (min-width: $breakpoint-huge) {
+      margin: 0;
+    }
+
+  }
 
   h3 {
     font-size: 2em;
@@ -72,34 +107,65 @@
 
 .iconGrid {
 
+  display: flex;
+  justify-content: center;
+  width: 100%;
   text-align: inherit;
   margin: 4em 0;
 
   ul {
+
     display: flex;
-    width: 100%;
+    flex-direction: column;
     list-style: none;
     padding: 0;
-    margin: 0;
+    margin: 0 auto;
+
+    @media (min-width: $breakpoint-large) {
+      flex-direction: row;
+    }
+
   }
 
   li {
-    width: 100%;
-    padding: 0 4em;
+    
+    display: flex;
+    flex-direction: row;
+    padding: 0;
+    margin-bottom: 2em;
+
+    @media (min-width: $breakpoint-large) {
+      flex-direction: column;
+      padding: 0 4em;
+      margin: 0;
+    }
+
   }
 
 }
 
 .iconGridIcon {
+
   display: flex;
   align-items: center;
   justify-content: center;
   color: $color-brand-gray-dark;
-  width: 100%;
+  width: 1em;
   aspect-ratio: 1/1;
   font-size: 6em;
   background-color: $color-primary;
   border-radius: 100%;
+  margin-right: .3em;
+
+  @media (min-width: $breakpoint-small) {
+    width: 1.5em;
+  }
+
+  @media (min-width: $breakpoint-large) {
+    width: 100%;
+    margin-right: 0;
+  }
+
 }
 
 .iconGridTitle {
@@ -147,6 +213,10 @@
 
 .breakdownUrl {
 
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: .9em;
   text-align: left;
   margin-bottom: 1.5em;
@@ -166,13 +236,16 @@
 
 .breakdownImage {
   display: flex;
+  width: 100%;
   margin-bottom: 3em;
 }
 
 .breakdownVersions {
 
   display: flex;
-  flex-grow: 1;
+  flex-grow: 0;
+  flex-shrink: 0;
+  width: 70%;
   text-align: left;
   margin: 0 -1em;
 
@@ -197,13 +270,14 @@
 
   img {
     display: block;
+    background-color: darken($color-brand-gray-light, 10);
   }
 
 }
 
 .breakdownMeta {
 
-  flex-shrink: 0;
+  flex-grow: 1;
   text-align: left;
   margin-left: 2em;
 

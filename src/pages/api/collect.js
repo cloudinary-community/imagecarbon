@@ -1,3 +1,4 @@
+import pLimit from 'p-limit';
 import { co2, hosting } from '@tgwf/co2';
 
 import { getCloudinary } from '@/lib/cloudinary-server';
@@ -9,30 +10,51 @@ const emissions = new co2();
 
 const OPTIMIZED_FORMAT = 'avif';
 
+const limit = pLimit(10);
+
 export default async function handler(req, res) {
+  const body = JSON.parse(req.body);
+  const { images } = body;
+  const siteUrl = cleanUrl(body.siteUrl);
+
   try {
-    const { images, siteUrl } = JSON.parse(req.body);
-
-    const uploads = [];
-
-    for (const image of images) {
-      const resource = await cloudinary.uploader.upload(image, {
-        folder: 'imagecarbon',
-        tags: ['imagecarbon', `imagecarbon:site:${siteUrl}`]
+    const imagesQueue = images.map(image => {
+      return limit(() => {
+        async function upload() {
+          try {
+            const results = await cloudinary.uploader.upload(image, {
+              folder: 'imagecarbon',
+              tags: ['imagecarbon', `imagecarbon:site:${siteUrl}`],
+              context: {
+                siteUrl,
+                originalUrl: image
+              }
+            });
+            return results;
+          } catch(e) {
+            console.log(`[${siteUrl}] Failed to upload image ${image}: ${e.message}`);
+            return;
+          }
+        };
+        return upload();
       });
-      uploads.push({
-        url: image,
-        resource
-      });
-    }
+    });
+
+
+    let uploads = await Promise.all(imagesQueue);
+    
+    // Filter out failed image upload requests
+
+    uploads = uploads.filter(upload => !!upload);
 
     const hosts = {
       'res.cloudinary.com': await hosting.check('res.cloudinary.com')
     };
 
-
     const results = await Promise.all(uploads.map(async (upload) => {
-      const host = cleanUrl(upload.url).split('/')?.[0];
+      const { originalUrl } = upload.context.custom;
+
+      const host = cleanUrl(originalUrl).split('/')?.[0];
 
       if ( typeof hosts[host] === 'undefined' ) {
         hosts[host] = await hosting.check(host);
@@ -40,7 +62,7 @@ export default async function handler(req, res) {
 
       const optimizedUrl = constructCloudinaryUrl({
         options: {
-          src: upload.resource.public_id,
+          src: upload.public_id,
           format: OPTIMIZED_FORMAT
         },
         config: {
@@ -53,17 +75,17 @@ export default async function handler(req, res) {
       const optimizedSize = await getFileSize(optimizedUrl);
 
       return {
-        height: upload.resource.height,
-        width: upload.resource.width,
+        height: upload.height,
+        width: upload.width,
         original: {
-          format: upload.resource.format,
-          size: upload.resource.bytes,
-          url: upload.url,
-          co2: emissions.perByte(upload.resource.bytes, hosts[host])
+          format: upload.format,
+          size: upload.bytes,
+          url: originalUrl,
+          co2: emissions.perByte(upload.bytes, hosts[host])
         },
         uploaded: {
-          url: upload.resource.secure_url,
-          publicId: upload.resource.public_id,
+          url: upload.secure_url,
+          publicId: upload.public_id,
         },
         optimized: {
           format: OPTIMIZED_FORMAT,
@@ -79,7 +101,7 @@ export default async function handler(req, res) {
       images: results
     });
   } catch(e) {
-    console.log(`Failed to collect image assets: ${e.message}`);
+    console.log(`[${siteUrl}] Failed to collect image assets: ${e.message}`);
     res.status(500).json({
       error: e.message
     })

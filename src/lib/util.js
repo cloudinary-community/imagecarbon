@@ -27,3 +27,29 @@ export async function getFileSize(url) {
   const data = await fetch(url).then(r => r.blob());
   return data.size;
 }
+
+/**
+ * addNumbers
+ */
+
+export function addNumbers(sizes = []) {
+  return sizes.reduce((prev, curr) => prev + curr, 0);
+}
+
+/**
+ * deduplicateArrayByKey
+ * @via Thanks ChatGPT
+ */
+
+export function deduplicateArrayByKey(arr, key) {
+  const seen = new Set(); // to keep track of seen keys
+  return arr.filter((item) => {
+    const value = item[key];
+    if (seen.has(value)) {
+      return false; // skip this item if the key has already been seen
+    } else {
+      seen.add(value); // mark this key as seen
+      return true; // include this item in the filtered array
+    }
+  });
+}

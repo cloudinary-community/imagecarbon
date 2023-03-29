@@ -1,9 +1,9 @@
 import { scrapingBeeRequest } from '@/lib/scrapingbee';
 
 export default async function handler(req, res) {
-  try {
-    const { siteUrl } = JSON.parse(req.body);
+  const { siteUrl } = JSON.parse(req.body);
 
+  try {
     const results = await scrapingBeeRequest({
       url: siteUrl,
       extractRules: {
@@ -46,7 +46,7 @@ export default async function handler(req, res) {
       images
     });
   } catch(e) {
-    console.log(`Failed to scrape website: ${e.message}`);
+    console.log(`[${cleanUrl(body.siteUrl)}] Failed to scrape website: ${e.message}`);
     res.status(500).json({
       error: e.message
     })

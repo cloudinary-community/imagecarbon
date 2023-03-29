@@ -6,9 +6,9 @@ import { SCRAPING_CACHE_TIME } from '@/data/scraping';
 const xata = getXataClient();
 
 export default async function handler(req, res) {
+  const siteUrl = cleanUrl(req.query.url);
+  
   try {
-    const siteUrl = cleanUrl(req.query.url);
-
     const records = await xata.search.all(siteUrl, {
       tables: [
         { table: "Sites", target: [{ column: "siteUrl" }] },
@@ -24,15 +24,13 @@ export default async function handler(req, res) {
       return;
     }
 
-    const images = await xata.db.Images.filter({
-      siteUrl
-    }).getMany();
+    const images = await xata.db.Images.filter({ siteUrl }).getAll();
 
     res.status(200).json({
       images
     });
   } catch(e) {
-    console.log(`Failed to get cache: ${e.message}`);
+    console.log(`[${siteUrl}] Failed to get cache: ${e.message}`);
     res.status(500).json({
       error: e.message
     })
