@@ -38,7 +38,6 @@ export async function findSiteImagesByUrl(url) {
     throw new Error(error);
   }
 
-  return images?
-    .filter(({ src }) => !!src)
+  return images?.filter(({ src }) => !!src)
     .filter(({ src }) => !src.includes('data:image/'));
 }
