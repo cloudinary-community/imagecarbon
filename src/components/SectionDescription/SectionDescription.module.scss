@@ -19,20 +19,32 @@
     font-size: 1.8em;
   }
 
+  &[data-text-size="tiny"] {
+    font-size: 1.2em;
+  }
+
   &[data-text-color="white"] {
     color: white;
   }
 
+  &[data-text-color="note"] {
+    color: $color-text-note;
+  }
+
+  &[data-text-weight="normal"] {
+    font-weight: $text-weight-normal;
+  }
+
   &[data-text-weight="semibold"] {
-    font-weight: semibold;
+    font-weight: $text-weight-semibold;
   }
 
   &[data-text-weight="bold"] {
-    font-weight: bold;
+    font-weight: $text-weight-bold;
   }
 
   &[data-text-weight="black"] {
-    font-weight: black;
+    font-weight: $text-weight-black;
   }
 
 }

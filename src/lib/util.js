@@ -38,13 +38,21 @@ export function addNumbers(sizes = []) {
 
 /**
  * deduplicateArrayByKey
- * @via Thanks ChatGPT
+ * @via Thanks ChatGPT + tweaks
  */
 
 export function deduplicateArrayByKey(arr, key) {
+  if ( !Array.isArray(arr) ) return arr;
+  
   const seen = new Set(); // to keep track of seen keys
+
   return arr.filter((item) => {
-    const value = item[key];
+    let value = item[key];
+
+    if ( typeof key === 'function' ){
+      value = key(item);
+    }
+    
     if (seen.has(value)) {
       return false; // skip this item if the key has already been seen
     } else {

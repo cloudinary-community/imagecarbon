@@ -43,7 +43,7 @@ const FormSubmitWebsite = ({ className, ...rest }) => {
 
       url = encodeURIComponent(url);
 
-      router.push(`sites/${url}`);
+      router.push(`/sites/${url}`);
     }
   }
 

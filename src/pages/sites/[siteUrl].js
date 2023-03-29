@@ -25,10 +25,16 @@ const fetcher = (url) => fetch(url).then((res) => res.json());
 export default function Site({ siteUrl, meta = {} }) {
   const { screenshotUrl } = meta;
 
-  const [siteImages, setSiteImages] = useState();
-  const [scrapeIsLoading, setScrapeIsLoading] = useState(false);
+  const [error, setError] = useState();
 
-  const { data: cacheData, error: cacheError, isLoading: cacheIsLoading } = useSWR(`/api/sites/cache?url=${siteUrl}`, fetcher);
+  const [siteImages, setSiteImages] = useState();
+
+  // Default the loading state to true as the first action the page will take is the scrape
+  // if not cached
+  const [scrapeIsLoading, setScrapeIsLoading] = useState(true);
+
+  // Default the cache loading state to true so we don't show the site until we know it's cached
+  const { data: cacheData, error: cacheError, isLoading: cacheIsLoading = true } = useSWR(`/api/sites/cache?url=${siteUrl}`, fetcher);
   
   const isLoading = scrapeIsLoading || cacheIsLoading;
   const isOptimized = siteImages?.filter(({ optimized }) => !!optimized)?.length > 0;
@@ -44,13 +50,44 @@ export default function Site({ siteUrl, meta = {} }) {
   const totalCo2Optimized = siteImages && isOptimized ? addNumbers(siteImages?.map(({ optimized }) => optimized.co2)) : undefined;
   const totalCo2Savings = totalCo2Original && totalCo2Optimized && Math.ceil(100 - (totalCo2Optimized / totalCo2Original * 100));
 
+  // Construct an array of images that actually make sense to show, with
+  // non negligible sizes and deduplication
+
+  let activeImages = deduplicateArrayByKey(siteImages, ({ original }) => original.url);
+  
+  activeImages = activeImages?.filter(({ original }) => {
+    if ( !original?.size ) return true;
+    // Filter out images smaller than 5kb
+    return original.size > 5000;
+  }).map(image => {
+    // Collect the savings for each image both in size and carbon
+    if ( !image.original?.co2 || !image.original?.size ) return image;
+
+    const savingsSize = image.original?.size - image.optimized?.size;
+    const savingsCarbon = image.original?.co2 - image.optimized?.co2;
+
+    return {
+      ...image,
+      savingsSize,
+      savingsCarbon
+    }
+  });
+
+  // Sort the images by the biggest savings in carbon
+
+  activeImages?.sort((a, b) => b.savingsCarbon - a.savingsCarbon);
+
+  const numberHiddenImages = activeImages && siteImages.length - activeImages.length;
+
   useEffect(() => {
     if ( typeof cacheData === 'undefined' && !cacheError ) return;
+
+    setError(false);
 
     console.log(`Begin scraping ${siteUrl}...`);
 
     if ( cacheData.images ) {
-      console.log(`Cache found! Restoring ${cacheData.length} images.`)
+      console.log(`Cache found! Restoring ${cacheData.images.length} images.`)
 
       const images = cacheData.images.map(image => {
         return {
@@ -77,11 +114,7 @@ export default function Site({ siteUrl, meta = {} }) {
           siteUrl
         });
 
-        // Create a deduplicated list of just 
-
-        images = deduplicateArrayByKey(images, 'url');
-
-        console.log(`Found ${images.length} images.`)
+        console.log(`Found ${images?.length} images.`)
 
         images = images.map(image => {
           return {
@@ -117,6 +150,7 @@ export default function Site({ siteUrl, meta = {} }) {
 
         console.log(`Added site to cache for next time!`)
       } catch(e) {
+        setError(e.message);
         console.log(`Something went wrong! ${e.message}`);
       }
     })();
@@ -132,7 +166,7 @@ export default function Site({ siteUrl, meta = {} }) {
       </Head>
 
 
-      {isLoading && (
+      {isLoading && !error && (
         <Section>
           <Container className={styles.siteContainer} size="narrow">
             <SectionTitle>
@@ -145,7 +179,7 @@ export default function Site({ siteUrl, meta = {} }) {
         </Section>
       )}
 
-      {!isLoading && (
+      {!isLoading && !error && (
         <>
           <Section>
             <Container className={styles.siteContainer} size="narrow">
@@ -265,27 +299,28 @@ export default function Site({ siteUrl, meta = {} }) {
                 Here&apos;s a breakdown of your images...
               </SectionTitle>
               
-              <SectionDescription size="small">
+              <SectionDescription size="small" weight="normal">
+                Optimizations use a format of AVIF with smart compression.
+              </SectionDescription>
+              
+              <SectionDescription size="tiny" weight="normal" color="note">
                 Note: Images may appear cropped and optimized for display purposes only. Results are based on original full-sized images.
               </SectionDescription>
               
               <ul className={styles.breakdownImages}>
-                {siteImages && siteImages.map(siteImage => {
-                  const estimatedSizeSavings = Math.ceil((siteImage.original?.size - siteImage.optimized?.size) / 1000);
-                  const estimatedCarbonSavings = Math.ceil((siteImage.original?.co2 - siteImage.optimized?.co2) / 1000);
+                {activeImages && activeImages.map(image => {
+                  const estimatedSizeSavings = Math.ceil((image.original?.size - image.optimized?.size) / 1000);
+                  const estimatedCarbonSavings = Math.ceil((image.original?.co2 - image.optimized?.co2) / 1000);
 
                   return (
-                    <li key={siteImage?.original.url}>
-                      <p className={styles.breakdownUrl}>
-                        <a href={siteImage?.original.url} title={siteImage?.original.url}>{ siteImage?.original.url }</a>
-                      </p>
+                    <li key={image?.original.url}>
                       <div className={styles.breakdownImage}>
                         <div className={styles.breakdownVersions}>
                           <div>
-                            {siteImage?.uploaded?.url && (
+                            {image?.uploaded?.url && (
                               <CldImage
-                                key={siteImage.uploaded.url}
-                                src={siteImage.uploaded.url}
+                                key={image.uploaded.url}
+                                src={image.uploaded.url}
                                 width="800"
                                 height="600"
                                 crop="fill"
@@ -295,17 +330,17 @@ export default function Site({ siteUrl, meta = {} }) {
                               />
                             )}
                             <p>
-                              Size: { siteImage.original?.size && Math.ceil(siteImage.original?.size / 1000) }kb
+                              Size: { image.original?.size && Math.ceil(image.original?.size / 1000) }kb
                             </p>
                             <p>
-                              Carbon: { siteImage.original?.co2?.toFixed(3) }g
+                              Carbon: { image.original?.co2?.toFixed(3) }g
                             </p>
                           </div>
                           <div>
-                            {siteImage?.optimized?.url && (
+                            {image?.optimized?.url && (
                               <CldImage
-                                key={siteImage.optimized.url}
-                                src={siteImage.optimized.url}
+                                key={image.optimized.url}
+                                src={image.optimized.url}
                                 width="800"
                                 height="600"
                                 crop="fill"
@@ -315,10 +350,10 @@ export default function Site({ siteUrl, meta = {} }) {
                               />
                             )}
                             <p>
-                              Size: { siteImage.optimized?.size && Math.ceil(siteImage.optimized?.size / 1000) }kb
+                              Size: { image.optimized?.size && Math.ceil(image.optimized?.size / 1000) }kb
                             </p>
                             <p>
-                              Carbon: { siteImage.optimized?.co2?.toFixed(3) }g
+                              Carbon: { image.optimized?.co2?.toFixed(3) }g
                             </p>
                           </div>
                         </div>
@@ -338,13 +373,55 @@ export default function Site({ siteUrl, meta = {} }) {
                           </ul>
                         </div>
                       </div>
+                      <p className={styles.breakdownUrl}>
+                        <a href={image?.original.url} title={image?.original.url}>{ image?.original.url }</a>
+                      </p>
                     </li>
                   )
                 })}
               </ul>
+              {numberHiddenImages && numberHiddenImages > 0 && (
+                <SectionDescription className={styles.breakdownHidden} size="tiny" color="note">
+                  <strong>{ numberHiddenImages }</strong> images not shown due to deduplication or smaller than 5kb in size.
+                </SectionDescription>
+              )}
+            </Container>
+          </Section>
+          <Section id="check-another-site">
+            <Container>
+              <SectionTitle>
+                Check another website!
+              </SectionTitle>
+              
+              <SectionDescription size="small">
+                Whether it&apos;s another page or a whole new site, it&apos;s
+                important to have an understanding of where projects stand.
+              </SectionDescription>
+
+              <FormSubmitWebsite />
             </Container>
           </Section>
         </>
+      )}
+
+      {error && (
+        <Section>
+          <Container>
+            <SectionTitle>
+              Something went wrong...
+            </SectionTitle>
+              
+            <SectionDescription size="small">
+              Error: { error }
+            </SectionDescription>
+              
+            <SectionDescription size="small">
+              Try again or try a new site!
+            </SectionDescription>
+
+            <FormSubmitWebsite />
+          </Container>
+        </Section>
       )}
 
     </Layout>

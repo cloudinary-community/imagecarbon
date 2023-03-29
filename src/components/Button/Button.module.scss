@@ -26,7 +26,7 @@
   }
 
   &:disabled {
-    color: rgba(white, 0.5);
+    color: rgba($color-brand-gray-darker, 0.5);
     background-color: lighten($color-primary, 8);
     cursor: default;
     opacity: .6;
