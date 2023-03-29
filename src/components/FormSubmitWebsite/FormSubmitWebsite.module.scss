@@ -1,8 +1,20 @@
+@import "@/styles/settings/_settings";
+
 .formSubmitWebsite {
 
+  position: relative;
   max-width: 20em;
-  font-size: 1.4em;
+  font-size: 1em;
+  padding-bottom: 1em;
   margin: 0 auto;
+
+  @media (min-width: $breakpoint-medium) {
+    font-size: 1.2em;
+  }
+
+  @media (min-width: $breakpoint-large) {
+    font-size: 1.4em;
+  }
 
   input,
   button {
@@ -11,6 +23,19 @@
 
   input {
     text-align: center;
+  }
+
+}
+
+.formRowError {
+  
+  position: absolute;
+  top: 100%;
+  width: 100%;
+  margin-top: -.5em;
+
+  p {
+    font-size: .9em;
   }
 
 }

@@ -7,3 +7,22 @@
 .homeWebsiteSubmit {
   margin-top: 2.5em;
 }
+
+.caption {
+    
+  font-size: .9em;
+  text-align: center;
+  margin-top: .8em;
+
+  a {
+    
+    color: $color-text-note;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+  }
+
+}

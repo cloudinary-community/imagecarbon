@@ -233,7 +233,7 @@ export default function Site({ siteUrl, meta = {} }) {
           <Section>
             <Container className={`${styles.siteContainer}`} size="narrow">
 
-              <SectionTitle>
+              <SectionTitle as="h2">
                 How much <strong>carbon</strong> is that?
               </SectionTitle>
               
@@ -295,7 +295,7 @@ export default function Site({ siteUrl, meta = {} }) {
           <Section>
             <Container className={`${styles.siteContainer}`} size="narrow">
 
-              <SectionTitle>
+              <SectionTitle as="h2">
                 Here&apos;s a breakdown of your images...
               </SectionTitle>
               
@@ -389,7 +389,7 @@ export default function Site({ siteUrl, meta = {} }) {
           </Section>
           <Section id="check-another-site">
             <Container>
-              <SectionTitle>
+              <SectionTitle as="h2">
                 Check another website!
               </SectionTitle>
               
@@ -412,7 +412,7 @@ export default function Site({ siteUrl, meta = {} }) {
             </SectionTitle>
               
             <SectionDescription size="small">
-              Error: { error }
+              { error }
             </SectionDescription>
               
             <SectionDescription size="small">

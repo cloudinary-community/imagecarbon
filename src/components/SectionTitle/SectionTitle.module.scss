@@ -1,4 +1,17 @@
+@import "@/styles/settings/_settings";
+
 .SectionTitle {
+  
+  font-size: 2em;
   text-align: center;
   margin: .5em 0;
+
+  @media (min-width: $breakpoint-medium) {
+    font-size: 3em;
+  }
+
+  @media (min-width: $breakpoint-large) {
+    font-size: 3.8em;
+  }
+
 }

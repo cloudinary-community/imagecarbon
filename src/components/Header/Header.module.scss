@@ -1,17 +1,25 @@
 @import "@/styles/settings/_settings";
 
 .header {
+
   width: 100%;
   font-size: 1em;
   color: $color-brand-gray-light;
-  padding: 1em 0;
+  padding: .5em 0;
   margin: 0;
+
+  @media (min-width: $breakpoint-medium) {
+    padding: 1em 0;
+  }
+
 }
 
 .headerContainer {
+  
   display: flex;
   justify-content: space-between;
   align-items: center;
+
 }
 
 .headerTitle {
@@ -27,17 +35,20 @@
 }
 
 .headerLinks {
+  
   display: flex;
   list-style: none;
   padding: 0;
   margin: 0 2em;
 
-  @media (max-width: 720px) {
-    width: 100%;
-    align-items: center;
-    justify-content: center;
-    margin: 0;
+  &:first-child {
+    margin-left: 0;
   }
+
+  &:last-child {
+    margin-right: 0;
+  }
+
 
   li {
     margin: 0 0.8em;

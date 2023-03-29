@@ -17,11 +17,6 @@ a {
   box-sizing: border-box;
 }
 
-img {
-  max-width: 100%;
-  height: auto;
-}
-
 h1,
 h2,
 h3 {
@@ -47,9 +42,20 @@ p {
 }
 
 img {
+  max-width: 100%;
+  height: auto;
   border-radius: .2em;
   border: solid 2px $color-brand-gray-light;
   box-shadow: 0 2px 10px rgba($color-brand-gray-darker, .8);
+}
+
+figure {
+  display: grid;
+  margin: 0;
+}
+
+figcaption {
+  word-break: break-word;
 }
 
 .sr-only {

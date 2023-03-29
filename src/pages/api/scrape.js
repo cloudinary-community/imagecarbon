@@ -5,6 +5,8 @@ export const config = {
   runtime: 'edge',
 }
 
+const SCRAPING_TIMEOUT = 30 * 1000; // 30 seconds
+
 export default async function handler(res) {
 	const { siteUrl } = await res.json();
 
@@ -12,10 +14,25 @@ export default async function handler(res) {
     let images;
 
     try {
-      images = await findSiteImagesByUrl(siteUrl);
+      const results = await Promise.race([
+        findSiteImagesByUrl(siteUrl),
+        new Promise((resolve) => {
+          setTimeout(() => resolve(false), SCRAPING_TIMEOUT);
+        })
+      ]);
+
+      if ( !results ) {
+        throw new Error('Scraping timed out');
+      }
+
+      images = results;
     } catch(e) {
       if ( e.message.includes('If you wish to scrape') ) {
         throw new Error('This website does not allow scraping');
+      } else if ( e.message.includes('Scraping timed out') ) {
+        throw new Error('We had trouble connecting to this website.');
+      } else {
+        throw e;
       }
     }
 

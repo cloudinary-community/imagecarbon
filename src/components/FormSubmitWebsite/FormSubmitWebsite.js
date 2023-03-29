@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 
-import { cleanUrl } from '@/lib/util';
+import { cleanUrl, restoreUrl, isValidUrl } from '@/lib/util';
 
 import Form from '@/components/Form';
 import FormRow from '@/components/FormRow';
@@ -14,6 +14,7 @@ const FormSubmitWebsite = ({ className, ...rest }) => {
   const router = useRouter();
 
   const [isLoading, setIsLoading] = useState();
+  const [error, setError] = useState();
 
   let formClassName = styles.formSubmitWebsite;
 
@@ -24,8 +25,6 @@ const FormSubmitWebsite = ({ className, ...rest }) => {
   function handleOnSubmit(e) {
     e.preventDefault();
 
-    setIsLoading(true);
-    
     const fields = Array.from(e.currentTarget.elements);
     const values = fields.filter(({ name }) => !!name).map(field => {
       return {
@@ -35,6 +34,19 @@ const FormSubmitWebsite = ({ className, ...rest }) => {
     });
     
     let url = values.find(({ name }) => name === 'url')?.value;
+
+    // First check if it's a valid domain / URL
+
+    const isValid = isValidUrl(restoreUrl(url));
+
+    if ( !isValid ) {
+      setError('Please enter a valid URL.');
+      return;
+    }
+
+    // If it is, continue with submission
+
+    setIsLoading(true);
     
     if ( url ) {
       // Make the URLs look a little better by stripping the protocol and trailing slashes
@@ -47,13 +59,22 @@ const FormSubmitWebsite = ({ className, ...rest }) => {
     }
   }
 
+  function handleOnInputChange() {
+    setError();
+  }
+
   return (
     <Form className={formClassName} onSubmit={handleOnSubmit} {...rest}>
       <FormRow>
-        <FormInput type="text" name="url" placeholder="mywebsite.com" />
+        <FormInput type="text" name="url" placeholder="mywebsite.com" onChange={handleOnInputChange} />
       </FormRow>
       <FormRow>
         <Button disabled={isLoading}>Calculate Emissions</Button>
+      </FormRow>
+      <FormRow className={styles.formRowError}>
+        {error && (
+          <p>{ error }</p>
+        )}
       </FormRow>
     </Form>
   );

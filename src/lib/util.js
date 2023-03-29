@@ -61,3 +61,21 @@ export function deduplicateArrayByKey(arr, key) {
     }
   });
 }
+
+/**
+ * isValidUrl
+ */
+
+export function isValidUrl(string) {
+  try {
+    const url = new URL(string);
+
+    if ( !url.host.split('.')[1] ) {
+      throw new Error();
+    }
+
+    return true;
+  } catch(e) {
+    return false;
+  }
+}

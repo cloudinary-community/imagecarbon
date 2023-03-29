@@ -2,9 +2,17 @@
 
 .SectionDescription {
 
-  font-size: 2em;
+  font-size: 1.2em;
   font-weight: $text-weight-normal;
   text-align: center;
+
+  @media (min-width: $breakpoint-medium) {
+    font-size: 1.5em;
+  }
+
+  @media (min-width: $breakpoint-large) {
+    font-size: 2em;
+  }
 
   strong {
     color: $color-primary;
@@ -16,11 +24,30 @@
   }
 
   &[data-text-size="small"] {
-    font-size: 1.8em;
+
+    font-size: 1em;
+
+    @media (min-width: $breakpoint-medium) {
+      font-size: 1.2em;
+    }
+  
+    @media (min-width: $breakpoint-large) {
+      font-size: 1.8em;
+    }
+
   }
 
   &[data-text-size="tiny"] {
-    font-size: 1.2em;
+
+    font-size: .8em;
+
+    @media (min-width: $breakpoint-medium) {
+      font-size: 1em;
+    }
+  
+    @media (min-width: $breakpoint-large) {
+      font-size: 1.5em;
+    }
   }
 
   &[data-text-color="white"] {

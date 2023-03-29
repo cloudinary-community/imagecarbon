@@ -1,10 +1,10 @@
 import styles from './SectionTitle.module.scss';
 
-const SectionTitle = ({ children }) => {
+const SectionTitle = ({ children, as: Component = 'h1' }) => {
   return (
-    <h1 className={styles.SectionTitle}>
+    <Component className={styles.SectionTitle}>
       {children}
-    </h1>
+    </Component>
   );
 }
 
