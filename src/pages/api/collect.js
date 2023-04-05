@@ -81,7 +81,7 @@ export default async function handler(req, res) {
           format: upload.format,
           size: upload.bytes,
           url: originalUrl,
-          co2: emissions.perByte(upload.bytes, hosts[host])
+          co2: emissions.perVisit(upload.bytes, hosts[host])
         },
         uploaded: {
           url: upload.secure_url,
@@ -91,7 +91,7 @@ export default async function handler(req, res) {
           format: OPTIMIZED_FORMAT,
           url: optimizedUrl,
           size: optimizedSize,
-          co2: emissions.perByte(optimizedSize, hosts['res.cloudinary.com'])
+          co2: emissions.perVisit(optimizedSize, hosts['res.cloudinary.com'])
         }
       }
     }));

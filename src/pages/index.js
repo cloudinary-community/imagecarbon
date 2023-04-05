@@ -6,7 +6,7 @@ import Layout from '@/components/Layout';
 import Section from '@/components/Section';
 import Container from '@/components/Container';
 import SectionTitle from '@/components/SectionTitle';
-import SectionDescription from '@/components/SectionDescription';
+import SectionText from '@/components/SectionText';
 import FormSubmitWebsite from '@/components/FormSubmitWebsite';
 
 import styles from '@/styles/Home.module.scss'
@@ -27,9 +27,9 @@ export default function Home() {
             What&apos;s the <strong>carbon</strong> footprint of the <strong>images</strong> on your website?
           </SectionTitle>
           
-          <SectionDescription>
+          <SectionText>
             Enter your website address and we&apos;ll estimate how much carbon your website is emitting from images.
-          </SectionDescription>
+          </SectionText>
           
           <FormSubmitWebsite className={styles.homeWebsiteSubmit} />
         </Container>
@@ -41,11 +41,11 @@ export default function Home() {
             Why images?
           </SectionTitle>
           
-          <SectionDescription size="small">
+          <SectionText size="small">
             Using the web inherently consumes energy. That energy results in CO2 emissions that contribute to global issues like climate change.
-          </SectionDescription>
+          </SectionText>
           
-          <figure>
+          <figure className={styles.emissionsImage}>
             <CldImage
               width="1200"
               height="742"
@@ -60,9 +60,9 @@ export default function Home() {
             </figcaption>
           </figure>
           
-          <SectionDescription size="small">
+          <SectionText size="small">
             While calculating the full extent of the impact your website is having is important, digital assets like images and videos are typically a large portion of the byte sent over the wire.
-          </SectionDescription>
+          </SectionText>
         </Container>
       </Section>
       
@@ -72,29 +72,70 @@ export default function Home() {
             What can we do about it?
           </SectionTitle>
           
-          <SectionDescription size="small">
+          <SectionText size="small">
             First step is recognizing the problem, but there are several low-effort ways to greatly reduce the size of your images.
-          </SectionDescription>
+          </SectionText>
 
-          <SectionDescription size="small">
+          <SectionText size="small">
             To start, modern image formats like AVIF, WebP, and JPEG XL offer better image quality and compression ratios than legacy formats. 
-          </SectionDescription>
+          </SectionText>
           
-          <ul>
+          <ul className={styles.imageComparison}>
             <li>
-              JPG 300kb
+              <CldImage
+                src="imagecarbon-assets/rainforest"
+                width="1118"
+                height="722"
+                alt="Rainforest with results as JPEG"
+              />
+              <span className={styles.imageComparisonTag} data-color="red">
+                <span className={styles.imageComparisonTagFormat}>JPG</span>
+                <span className={styles.imageComparisonTagSize}>2.7mb</span>
+              </span>
             </li>
             <li>
-              WebP 200kb
+              <CldImage
+                src="imagecarbon-assets/rainforest"
+                width="1118"
+                height="722"
+                alt="Rainforest with results as JPEG"
+              />
+              <span className={styles.imageComparisonTag} data-color="yellow">
+                <span className={styles.imageComparisonTagFormat}>WebP</span>
+                <span className={styles.imageComparisonTagSize}>1.7mb</span>
+              </span>
             </li>
             <li>
-              AVIF 100kb
+              <CldImage
+                src="imagecarbon-assets/rainforest"
+                width="1118"
+                height="722"
+                alt="Rainforest with results as JPEG"
+              />
+              <span className={styles.imageComparisonTag} data-color="green">
+                <span className={styles.imageComparisonTagFormat}>AVIF</span>
+                <span className={styles.imageComparisonTagSize}>874kb</span>
+              </span>
             </li>
           </ul>
-          
-          <SectionDescription size="small">
-            <strong>99.88% of images are not being sent in the optimal format!</strong> Imagine how much energy and carbon could be saved if the entire world started using those formats and optimized their images.
-          </SectionDescription>
+
+          <div className={styles.imageComparisonSource}>
+            <ul>
+              <li>
+                <a href="https://unsplash.com/photos/_qZ0us4az20">
+                  JPG based on original 4475x2889 image from unsplash.com
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <SectionText>
+            <strong>99.88% of images are not being sent in the optimal format!</strong>
+          </SectionText>
+
+          <SectionText size="small">
+            Imagine how much energy and carbon could be saved if the entire world started using those formats and optimized their images.
+          </SectionText>
         </Container>
       </Section>
       
@@ -104,9 +145,9 @@ export default function Home() {
             How do I check my website?
           </SectionTitle>
           
-          <SectionDescription size="small">
+          <SectionText size="small">
             Submit your website at the top of bottom of this page and we&apos;ll do the work to figure out the impact the images on your website are having on the environment.
-          </SectionDescription>
+          </SectionText>
 
           <ul>
             <li>
@@ -133,9 +174,9 @@ export default function Home() {
             Calculate your emissions!
           </SectionTitle>
           
-          <SectionDescription>
+          <SectionText>
             Start your journey to a more sustainable future by determining the impact your website images are having on the environment.
-          </SectionDescription>
+          </SectionText>
           
           <FormSubmitWebsite className={styles.homeWebsiteSubmit} />
         </Container>

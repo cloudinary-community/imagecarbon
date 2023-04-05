@@ -26,3 +26,102 @@
   }
 
 }
+
+.emissionsImage {
+  max-width: 40em;
+  margin: 0 auto;
+}
+
+.imageComparison {
+
+  display: grid;
+  grid-gap: 2em;
+  list-style: none;
+  padding: 0 3em;
+  margin: 3em 0;
+
+  @media (min-width: $breakpoint-large) {
+    padding: 0;
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  li {
+    position: relative;
+  }
+
+}
+
+.imageComparisonTag {
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  position: absolute;
+  top: -1em;
+  right: -1em;
+  width: 4em;
+  height: 4em;
+  font-size: 1.2em;
+  color: white;
+  background-color: black;
+  border-radius: 5em;
+  border: solid 2px lighten(black, 10);
+  box-shadow: 0 2px 10px rgba($color-brand-gray-darker, 1);
+
+  &[data-color="red"] {
+    background-color: $color-red;
+    border: solid 2px lighten($color-red, 10);
+  }
+
+  &[data-color="yellow"] {
+    color: $color-brand-gray-dark;
+    background-color: $color-brand-yellow;
+    border: solid 2px lighten($color-brand-yellow, 10);
+  }
+
+  &[data-color="green"] {
+  background-color: $color-green;
+  border: solid 2px lighten($color-green, 5);
+  }
+
+}
+
+.imageComparisonTagFormat,
+.imageComparisonTagSize {
+  display: block;
+  text-align: center;
+  line-height: 1;
+}
+
+.imageComparisonTagFormat {
+  font-weight: bold;
+}
+
+.imageComparisonTagSize {
+  font-size: .9em;
+}
+
+.imageComparisonSource {
+
+  color: $color-text-note;
+  text-align: inherit;
+
+  ul {
+    list-style: none;
+    line-height: 1.5;
+    padding: 0;
+    margin: 0;
+  }
+
+  a {
+
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+  }
+
+}

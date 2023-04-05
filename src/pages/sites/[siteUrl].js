@@ -4,9 +4,9 @@ import { CldImage } from 'next-cloudinary';
 import useSWR from 'swr';
 
 
-import { FaTree } from 'react-icons/fa';
+import { FaPizzaSlice, FaCoffee, FaGasPump } from 'react-icons/fa';
 
-import { restoreUrl, addNumbers, deduplicateArrayByKey } from '@/lib/util';
+import { restoreUrl, addNumbers, deduplicateArrayByKey, addCommas } from '@/lib/util';
 import { getSignedImageUrl } from '@/lib/cloudinary-server';
 import { scrapeImagesFromWebsite } from '@/lib/scraping';
 
@@ -14,7 +14,7 @@ import Layout from '@/components/Layout';
 import Section from '@/components/Section';
 import Container from '@/components/Container';
 import SectionTitle from '@/components/SectionTitle';
-import SectionDescription from '@/components/SectionDescription';
+import SectionText from '@/components/SectionText';
 import FormSubmitWebsite from '@/components/FormSubmitWebsite';
 import Button from '@/components/Button';
 
@@ -22,12 +22,19 @@ import styles from '@/styles/Site.module.scss'
 
 const fetcher = (url) => fetch(url).then((res) => res.json());
 
+const carbonTrees = 10000;
+const carbonGasoline = 8887;
+const carbonCoffee = 209;
+const carbonPizza = 10800 / 8;
+
 export default function Site({ siteUrl, meta = {} }) {
   const { screenshotUrl } = meta;
 
   const [error, setError] = useState();
-
+  const [requestsMonthly, setRequestsMonthly] = useState(10000);
   const [siteImages, setSiteImages] = useState();
+
+  const requestsYearly = requestsMonthly * 12;
 
   // Default the loading state to true as the first action the page will take is the scrape
   // if not cached
@@ -172,9 +179,16 @@ export default function Site({ siteUrl, meta = {} }) {
             <SectionTitle>
               Scanning your site!
             </SectionTitle>
-            <SectionDescription color="white" weight="semibold" size="small">
-              This might take a few seconds...
-            </SectionDescription>
+            {!siteImages && (
+              <SectionText color="white" weight="semibold" size="small">
+                This might take a few seconds...
+              </SectionText>
+            )}
+            {siteImages && (
+              <SectionText color="white" weight="semibold" size="small">
+                Found {siteImages.length} images, calculating emissions...
+              </SectionText>
+            )}
           </Container>
         </Section>
       )}
@@ -183,17 +197,17 @@ export default function Site({ siteUrl, meta = {} }) {
         <>
           <Section>
             <Container className={styles.siteContainer} size="narrow">
-              <SectionDescription color="white" weight="semibold" size="small">
+              <SectionText color="white" weight="semibold" size="small">
                 Your website produced <strong>{ totalCo2Original?.toFixed(3) }g</strong> of carbon from images alone.
-              </SectionDescription>
+              </SectionText>
 
               <SectionTitle>
                 You could reduce <strong>{ totalCo2Savings }%</strong> of the CO2 by <strong>optimizing your images</strong>!
               </SectionTitle>
 
-              <SectionDescription size="small">
+              <SectionText size="small">
                 Estimated using the <a href="https://sustainablewebdesign.org/calculating-digital-emissions/">Sustainable Web Design</a> model.
-              </SectionDescription>
+              </SectionText>
 
               <div className={styles.preview}>
                 <figure className={styles.previewImage}>
@@ -232,47 +246,51 @@ export default function Site({ siteUrl, meta = {} }) {
 
           <Section>
             <Container className={`${styles.siteContainer}`} size="narrow">
+              <SectionText color="white" weight="semibold" size="small">
+                Now assuming you get <strong>{ addCommas(requestsMonthly) }</strong> unique visitors per month...
+              </SectionText>
 
               <SectionTitle as="h2">
-                How much <strong>carbon</strong> is that?
+                How much <strong>carbon</strong> is that <strong>per year</strong>?
               </SectionTitle>
               
-              <SectionDescription color="white" weight="semibold" size="small">
-                Producing <strong>{ totalCo2Original?.toFixed(3) }g</strong> is like the equivalent of...
-              </SectionDescription>
+              <SectionText color="white" weight="semibold" size="small">
+                Producing <strong>{ totalCo2Original?.toFixed(3) * requestsMonthly }g</strong> is like the equivalent of...
+              </SectionText>
+
+              <SectionText size="tiny">
+                { totalCo2Original?.toFixed(3) }g x { addCommas(requestsMonthly) } = { totalCo2Original?.toFixed(3) * requestsMonthly }g
+              </SectionText>
 
               <div className={styles.iconGrid}>
                 <ul>
                   <li>
                     <span className={styles.iconGridIcon}>
-                      <FaTree />
+                      <FaPizzaSlice />
                     </span>
                     <span className={styles.iconGridTitle}>
-                      <strong>10</strong> trees
+                      <strong>{ (( totalCo2Original * requestsYearly ) / carbonPizza)?.toFixed(1) }</strong> slices of neapolitan pizza
+                    </span>
+                  </li>
+                  <li>
+                    
+                    <span className={styles.iconGridIcon}>
+                      <FaGasPump />
+                    </span>
+                    <span className={styles.iconGridTitle}>
+                      <strong>{ (( totalCo2Original * requestsYearly ) / carbonGasoline)?.toFixed(1) }</strong> gallons of gas burned
                     </span>
                   </li>
                   <li>
                     <span className={styles.iconGridIcon}>
-                      <FaTree />
+                      <FaCoffee />
                     </span>
                     <span className={styles.iconGridTitle}>
-                      <strong>10</strong> trees
-                    </span>
-                  </li>
-                  <li>
-                    <span className={styles.iconGridIcon}>
-                      <FaTree />
-                    </span>
-                    <span className={styles.iconGridTitle}>
-                      <strong>10</strong> trees
+                      <strong>{ (( totalCo2Original * requestsYearly ) / carbonCoffee)?.toFixed(1) }</strong> cups of coffee
                     </span>
                   </li>
                 </ul>
               </div>
-              
-              <SectionDescription color="white" weight="semibold" size="small">
-                for every <strong>10,000</strong> requests
-              </SectionDescription>
 
               <div className={styles.sources}>
                 <ul>
@@ -284,6 +302,11 @@ export default function Site({ siteUrl, meta = {} }) {
                   <li>
                     <a href="https://www.epa.gov/greenvehicles/greenhouse-gas-emissions-typical-passenger-vehicle#:~:text=typical%20passenger%20vehicle%3F-,A%20typical%20passenger%20vehicle%20emits%20about%204.6%20metric%20tons%20of,8%2C887%20grams%20of%20CO2.">
                       EPA - Greenhouse Gas Emissions from a Typical Passenger Vehicle
+                    </a>
+                  </li>
+                  <li>
+                    <a href="https://www.23degrees.com.au/blog/carbon-footprint-coffee-supply-chain/">
+                      What is the carbon footprint of your cup of coffee?
                     </a>
                   </li>
                 </ul>
@@ -299,13 +322,13 @@ export default function Site({ siteUrl, meta = {} }) {
                 Here&apos;s a breakdown of your images...
               </SectionTitle>
               
-              <SectionDescription size="small" weight="normal">
+              <SectionText size="small" weight="normal">
                 Optimizations use a format of AVIF with smart compression.
-              </SectionDescription>
+              </SectionText>
               
-              <SectionDescription size="tiny" weight="normal" color="note">
+              <SectionText size="tiny" weight="normal" color="note">
                 Note: Images may appear cropped and optimized for display purposes only. Results are based on original full-sized images.
-              </SectionDescription>
+              </SectionText>
               
               <ul className={styles.breakdownImages}>
                 {activeImages && activeImages.map(image => {
@@ -376,14 +399,17 @@ export default function Site({ siteUrl, meta = {} }) {
                       <p className={styles.breakdownUrl}>
                         <a href={image?.original.url} title={image?.original.url}>{ image?.original.url }</a>
                       </p>
+                      <p className={styles.breakdownUrl}>
+                        <a href={image?.optimized.url} title={image?.optimized.url}>{ image?.optimized.url }</a>
+                      </p>
                     </li>
                   )
                 })}
               </ul>
-              {numberHiddenImages && numberHiddenImages > 0 && (
-                <SectionDescription className={styles.breakdownHidden} size="tiny" color="note">
+              {typeof numberHiddenImages === 'number' && numberHiddenImages > 0 && (
+                <SectionText className={styles.breakdownHidden} size="tiny" color="note">
                   <strong>{ numberHiddenImages }</strong> images not shown due to deduplication or smaller than 5kb in size.
-                </SectionDescription>
+                </SectionText>
               )}
             </Container>
           </Section>
@@ -393,10 +419,10 @@ export default function Site({ siteUrl, meta = {} }) {
                 Check another website!
               </SectionTitle>
               
-              <SectionDescription size="small">
+              <SectionText size="small">
                 Whether it&apos;s another page or a whole new site, it&apos;s
                 important to have an understanding of where projects stand.
-              </SectionDescription>
+              </SectionText>
 
               <FormSubmitWebsite />
             </Container>
@@ -411,13 +437,13 @@ export default function Site({ siteUrl, meta = {} }) {
               Something went wrong...
             </SectionTitle>
               
-            <SectionDescription size="small">
+            <SectionText size="small">
               { error }
-            </SectionDescription>
+            </SectionText>
               
-            <SectionDescription size="small">
+            <SectionText size="small">
               Try again or try a new site!
-            </SectionDescription>
+            </SectionText>
 
             <FormSubmitWebsite />
           </Container>
