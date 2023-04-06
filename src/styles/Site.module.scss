@@ -1,5 +1,17 @@
 @import "@/styles/settings/_settings";
 
+@keyframes spinGrow { 
+  0% { 
+    transform: translateZ(0) translateY(-20vh) rotate(0deg) scale(2); 
+  }
+  50% { 
+    transform: translateZ(0) translateY(20vh) rotate(180deg) scale(5); 
+  } 
+  100% { 
+    transform: translateZ(0) translateY(-20vh) rotate(360deg) scale(2); 
+  } 
+}
+
 .siteContainer {
   position: relative;
   z-index: 1;
@@ -51,6 +63,21 @@
 
 }
 
+.siteHeroSectionLoading {
+  &:after {
+    opacity: .4;
+    background: conic-gradient(
+      from 180deg at 50% 50%,
+      transparent 0deg,
+      $color-brand-yellow 60deg,
+      transparent 220deg,
+      $color-brand-yellow 270deg,
+      transparent 360deg
+    );
+    animation: spinGrow 8s linear infinite;
+  }
+}
+
 .siteHeroContainer {
   padding: 2em;
 }
@@ -77,6 +104,7 @@
   
   img {
     display: block;
+    background-color: $color-brand-eggshell;
   }
 
   figcaption {
@@ -168,17 +196,24 @@
   font-size: 1.5em;
   background: none;
   border: none;
-  cursor: pointer;
 
-  &:hover {
+  &:not(:disabled) {
+    cursor: pointer;
+  }
+
+  &:hover:not(:disabled) {
     color: white;
     transform: scale(1.1);
     transition: transform .1s ease-in-out;
   }
 
-  &:active {
+  &:active:not(:disabled) {
     transform: scale(.95);
     transition: transform .1s ease-in-out;
+  }
+
+  &:disabled {
+    opacity: .5;
   }
 
 }

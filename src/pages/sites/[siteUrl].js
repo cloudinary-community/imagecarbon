@@ -21,6 +21,8 @@ import styles from '@/styles/Site.module.scss'
 const carbonGasoline = 8887;
 const carbonCoffee = 209;
 const carbonPizza = 10800 / 8;
+const REQUESTS_MONTHLY_INITIAL = 1000;
+const REQUESTS_MONTHLY_INCREMENT = 10000;
 
 export default function Site({ siteUrl, meta = {} }) {
   const { screenshotUrl } = meta;
@@ -38,7 +40,7 @@ export default function Site({ siteUrl, meta = {} }) {
     totalCo2Savings,
   } = collection;
 
-  const [requestsMonthly, setRequestsMonthly] = useState(10000);
+  const [requestsMonthly, setRequestsMonthly] = useState(REQUESTS_MONTHLY_INITIAL);
   const [showAllImages, setShowAllImages] = useState(false);
 
   const requestsYearly = requestsMonthly * 12;
@@ -77,11 +79,22 @@ export default function Site({ siteUrl, meta = {} }) {
   const numberHiddenImages = activeImages && siteImages.length - activeImages.length;
 
   function handleOnRequestsAdd() {
-    setRequestsMonthly(requestsMonthly + 1000);
+    if ( requestsMonthly === REQUESTS_MONTHLY_INITIAL ) {
+      setRequestsMonthly(REQUESTS_MONTHLY_INCREMENT);
+      return;
+    }
+    setRequestsMonthly(requestsMonthly + REQUESTS_MONTHLY_INCREMENT);
   }
 
   function handleOnRequestsSubtract() {
-    setRequestsMonthly(requestsMonthly - 1000);
+    if ( requestsMonthly === REQUESTS_MONTHLY_INITIAL ) return;
+
+    if ( requestsMonthly === REQUESTS_MONTHLY_INCREMENT) {
+      setRequestsMonthly(REQUESTS_MONTHLY_INITIAL);
+      return;
+    }
+
+    setRequestsMonthly(requestsMonthly - REQUESTS_MONTHLY_INCREMENT);
   }
 
   function handleShowMoreImages() {
@@ -99,7 +112,7 @@ export default function Site({ siteUrl, meta = {} }) {
 
 
       {isLoading && !error && (
-        <Section className={styles.siteHeroSection}>
+        <Section className={`${styles.siteHeroSection} ${styles.siteHeroSectionLoading}`}>
           <Container className={styles.siteContainer} size="narrow">
             <SectionTitle>
               Scanning your site!
@@ -145,7 +158,10 @@ export default function Site({ siteUrl, meta = {} }) {
                       alt={`${siteUrl} Screenshot`}
                     />
                   )}
-                  <figcaption><a href={siteUrl}>{ siteUrl }</a></figcaption>
+                  <figcaption>
+                    <p><a href={siteUrl}>{ siteUrl }</a></p>
+                    {/* <p>Last Refreshed: </p> */}
+                  </figcaption>
                 </figure>
                 <div className={styles.previewStats}>
                   <div>
@@ -182,7 +198,7 @@ export default function Site({ siteUrl, meta = {} }) {
                   <SectionTitle as="span">
                     <strong>{ addCommas(requestsMonthly) }</strong>
                   </SectionTitle> 
-                  <button className={styles.assumingCounterButton} onClick={handleOnRequestsSubtract}>
+                  <button className={styles.assumingCounterButton} onClick={handleOnRequestsSubtract} disabled={requestsMonthly === REQUESTS_MONTHLY_INITIAL}>
                     <FaMinusCircle />
                   </button>
                 </div>
@@ -462,6 +478,10 @@ export async function getStaticProps({ params }) {
     fetch_format: 'auto',
     quality: 'auto'
   });
+
+  // Preload the image to prime it to cache
+
+  await fetch(screenshotUrl);
 
   return {
     props: {
