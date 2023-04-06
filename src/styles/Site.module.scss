@@ -307,7 +307,7 @@
   margin: 4em 0 0;
 
   & > li {
-    margin-bottom: 4em;
+    margin-bottom: 6em;
   }
 
 }
@@ -412,7 +412,7 @@
   text-align: left;
   list-style: none;
   padding: 0;
-  margin: 2em 0 0 0;
+  margin: 3em 0 0 0;
 
   &,
   a {
@@ -420,7 +420,7 @@
   }
 
   li {
-    
+    display: grid;
     margin-bottom: .5em;
 
     &:last-child {
@@ -429,10 +429,14 @@
 
   }
 
+  p {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
   a {
 
-    white-space: normal;
-    word-break: break-all;
     text-decoration: none;
 
     &:hover {

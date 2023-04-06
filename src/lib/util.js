@@ -4,7 +4,7 @@
 
 export function cleanUrl(url) {
   if ( typeof url !== 'string' ) return url;
-  return url.replace(/http?s:\/\//, '').replace(/\/$/, '')
+  return url.toLowerCase().replace(/http?s:\/\//, '').replace(/\/$/, '')
 }
 
 /**

@@ -420,10 +420,14 @@ export default function Site({ siteUrl, meta = {} }) {
 
                       <ul className={styles.breakdownUrls}>
                         <li>
-                          Original: <a href={image?.original.url} title={image?.original.url}>{ image?.original.url }</a>
+                          <p>
+                            Original: <a href={image?.original.url} title={image?.original.url}>{ image?.original.url }</a>
+                          </p>
                         </li>
                         <li>
-                          Optimized: <a href={image?.optimized.url} title={image?.optimized.url}>{ image?.optimized.url }</a>
+                          <p>
+                            Optimized: <a href={image?.optimized.url} title={image?.optimized.url}>{ image?.optimized.url }</a>
+                          </p>
                         </li>
                       </ul>
                     </li>
