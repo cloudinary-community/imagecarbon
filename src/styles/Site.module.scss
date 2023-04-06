@@ -1,30 +1,80 @@
 @import "@/styles/settings/_settings";
 
 .siteContainer {
+  position: relative;
+  z-index: 1;
   text-align: center;
+}
+
+.siteHeroSection {
+
+  display: flex;
+  align-items: center;
+  position: relative;
+  min-height: calc(100vh - 3rem); // Must match header height
+  padding: 0;
+  margin: 0;
+
+  &:before,
+  &:after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    content: '';
+    filter: blur(80px);
+    transform: translateZ(0);
+    margin: auto;
+  }
+
+  &:before {
+    opacity: .15;
+    background: radial-gradient($color-brand-eggshell, $color-background);
+    border-radius: 50%;
+    width: 120vw;
+    height: 120vh;
+  }
+  
+  &:after {
+    opacity: .6;
+    z-index: 0;
+    width: 100vw;
+    height: 66vh;
+    background: conic-gradient(
+      from 180deg at 50% 50%,
+      $color-brand-yellow 0deg,
+      transparent 60deg,
+      transparent 360deg
+    );
+  }
+
+}
+
+.siteHeroContainer {
+  padding: 2em;
 }
 
 .preview {
   
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  max-width: 50em;
-  margin: 4em auto 0;
+  display: grid;
+  grid-gap: 3em;
+  max-width: 54em;
+  margin: 2em auto 0;
 
-  @media (min-width: $breakpoint-huge) {
-    flex-direction: row;
-    align-items: flex-start;
+  @media (min-width: $breakpoint-large) {
+    grid-template-columns: 6fr 4fr;
+    text-align: left;
+    margin: 4em auto 0;
   }
 
 }
 
 .previewImage {
-  
-  width: 60%;
-  margin: 0 3em 0 0;
 
+  max-width: 30em;
+  margin: 0 auto;
+  
   img {
     display: block;
   }
@@ -52,31 +102,12 @@
 
 .previewStats {
 
-  display: flex;
-  flex-direction: row;
-  color: white;
-  text-align: left;
-  margin-top: 2em;
+  & > div {
 
-  @media (min-width: $breakpoint-huge) {
-    flex-direction: column;
-    margin-top: 0;
-  }
-
-  div {
-
-    margin: 0 1.5em;
-
-    &:first-child {
-      margin-left: 0;
-    }
+    margin-bottom: 2em;
 
     &:last-child {
-      margin-right: 0;
-    }
-
-    @media (min-width: $breakpoint-huge) {
-      margin: 0;
+      margin-bottom: 0;
     }
 
   }
@@ -105,6 +136,40 @@
 
 }
 
+.assuming {
+
+  margin-bottom: 4em;
+  
+  p[data-text-size] {
+    margin: 0;
+  }
+
+}
+
+.assumingCounter {
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: .2em auto;
+
+  span {
+    margin: 0 .2em;
+  }
+
+}
+
+.assumingCounterButton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: $color-brand-eggshell;
+  font-size: 1.5em;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
 .iconGrid {
 
   display: flex;
@@ -115,14 +180,20 @@
 
   ul {
 
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-gap: 1em;
+    font-size: 1em;
     list-style: none;
     padding: 0;
     margin: 0 auto;
 
     @media (min-width: $breakpoint-large) {
-      flex-direction: row;
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    @media (min-width: $breakpoint-xlarge) {
+      font-size: 1.2em;
+      grid-gap: 2em;
     }
 
   }
@@ -131,12 +202,13 @@
     
     display: flex;
     flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
     padding: 0;
     margin-bottom: 2em;
 
     @media (min-width: $breakpoint-large) {
       flex-direction: column;
-      padding: 0 4em;
       margin: 0;
     }
 
@@ -149,21 +221,25 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-grow: 0;
+  flex-shrink: 0;
+  width: 2.5em;
+  height: 2.5em;
+  font-size: 2em;
   color: $color-brand-gray-dark;
-  width: 1em;
-  aspect-ratio: 1/1;
-  font-size: 6em;
   background-color: $color-primary;
-  border-radius: 100%;
-  margin-right: .3em;
+  border-radius: 10em;
+  margin-right: .8em;
+  margin-bottom: 0;
 
   @media (min-width: $breakpoint-small) {
-    width: 1.5em;
+    font-size: 3em;
   }
 
   @media (min-width: $breakpoint-large) {
-    width: 100%;
+    font-size: 4em;
     margin-right: 0;
+    margin-bottom: .4em;
   }
 
 }
@@ -171,12 +247,31 @@
 .iconGridTitle {
   
   display: block;
-  font-size: 2.5em;
-  font-weight: $text-weight-bold;
-  margin-top: 1em;
+  font-size: 1em;
+  text-align: left;
+
+  @media (min-width: $breakpoint-large) {
+    font-size: 1.2em;
+    text-align: center;
+  }
+
+  @media (min-width: $breakpoint-large) {
+    font-size: 1.5em;
+    text-align: center;
+  }
 
   strong {
+
+    display: block;
     color: $color-primary;
+    font-size: 1.5em;
+    line-height: .8;
+    margin-bottom: .2em;
+
+    @media (min-width: $breakpoint-large) {
+      margin-bottom: .5em;
+    }
+
   }
 
 }
@@ -206,59 +301,47 @@
 }
 
 .breakdownImages {
-
+  
   list-style: none;
   padding: 0;
   margin: 4em 0 0;
 
-  li {
+  & > li {
     margin-bottom: 4em;
   }
 
 }
 
-.breakdownUrl {
-
+.breakdownImage {
+  
+  display: grid;
+  grid-gap: 2em;
   width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: .9em;
-  text-align: left;
-  margin-top: 1em;
-
-  a {
-      
-    color: $color-text-note;
-    text-decoration: none;
-
-    &:hover {
-      text-decoration: underline;
-    }
-
+  
+  @media (min-width: $breakpoint-xlarge) {
+    
+    grid-template-columns: 7fr 3fr;
+  }
+  
+  @media (min-width: $breakpoint-huge) {
+    grid-gap: 3em;
   }
 
 }
 
-.breakdownImage {
-  display: flex;
-  width: 100%;
-}
-
 .breakdownVersions {
 
-  display: flex;
-  flex-grow: 0;
-  flex-shrink: 0;
-  width: 70%;
+  display: grid;
+  grid-gap: 2em;
   text-align: left;
-  margin: 0 -1em;
+  margin: 0;
 
-  & > div {
-    width: 50%;
-    flex-grow: 0;
-    flex-shrink: 0;
-    padding: 0 1em;
+  @media (min-width: $breakpoint-medium) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media (min-width: $breakpoint-huge) {
+    grid-gap: 3em;
   }
 
   p {
@@ -282,9 +365,7 @@
 
 .breakdownMeta {
 
-  flex-grow: 1;
   text-align: left;
-  margin-left: 2em;
 
   ul {
     list-style: none;
@@ -323,4 +404,41 @@
 
 .breakdownHidden {
   margin-top: 5em;
+}
+
+.breakdownUrls {
+
+  font-size: .9em;
+  text-align: left;
+  list-style: none;
+  padding: 0;
+  margin: 2em 0 0 0;
+
+  &,
+  a {
+    color: $color-text-note;
+  }
+
+  li {
+    
+    margin-bottom: .5em;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+  }
+
+  a {
+
+    white-space: normal;
+    word-break: break-all;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+  }
+
 }

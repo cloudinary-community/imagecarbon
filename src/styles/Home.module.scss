@@ -1,7 +1,63 @@
 @import "@/styles/settings/_settings";
 
+
 .homeContainer {
+  position: relative;
+  z-index: 1;
   text-align: center;
+}
+
+.homeHeroSection {
+  
+  display: flex;
+  align-items: center;
+  position: relative;
+  min-height: calc(100vh - 3rem); // Must match header height
+  padding: 0;
+  margin: 0;
+
+  & + section {
+    margin-top: 1em;
+  }
+
+  &:before,
+  &:after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    content: '';
+    filter: blur(80px);
+    transform: translateZ(0);
+    margin: auto;
+  }
+
+  &:before {
+    opacity: .15;
+    background: radial-gradient($color-brand-eggshell, $color-background);
+    border-radius: 50%;
+    width: 120vw;
+    height: 120vh;
+  }
+  
+  &:after {
+    opacity: .6;
+    z-index: 0;
+    width: 100vw;
+    height: 66vh;
+    background: conic-gradient(
+      from 180deg at 50% 50%,
+      $color-brand-yellow 0deg,
+      transparent 60deg,
+      transparent 360deg
+    );
+  }
+
+  @media (min-width: $breakpoint-medium) {
+    min-height: calc(100vh - 4rem);
+  }
+
 }
 
 .homeWebsiteSubmit {
@@ -124,4 +180,43 @@
 
   }
 
+}
+
+.gettingStarted {
+
+  max-width: 25em;
+  font-size: 1em;
+  text-align: left;
+  list-style: none;
+  padding: 0;
+  margin: 0 auto;
+
+  @media (min-width: $breakpoint-large) {
+    font-size: 1.5em;
+  }
+
+  li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 2em;
+  }
+
+}
+
+.gettingStartedIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 0;
+  flex-shrink: 0;
+  width: 2.5em;
+  height: 2.5em;
+  color: $color-brand-gray-dark;
+  background-color: $color-brand-yellow;
+  border-radius: 2.5em;
+  margin-right: 1em;
+}
+
+.gettingStartedText {
+  display: inline-block;
 }

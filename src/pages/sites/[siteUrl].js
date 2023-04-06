@@ -2,9 +2,7 @@ import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { CldImage } from 'next-cloudinary';
 import useSWR from 'swr';
-
-
-import { FaPizzaSlice, FaCoffee, FaGasPump } from 'react-icons/fa';
+import { FaPizzaSlice, FaCoffee, FaGasPump, FaPlusCircle, FaMinusCircle } from 'react-icons/fa';
 
 import { restoreUrl, addNumbers, deduplicateArrayByKey, addCommas } from '@/lib/util';
 import { getSignedImageUrl } from '@/lib/cloudinary-server';
@@ -22,7 +20,6 @@ import styles from '@/styles/Site.module.scss'
 
 const fetcher = (url) => fetch(url).then((res) => res.json());
 
-const carbonTrees = 10000;
 const carbonGasoline = 8887;
 const carbonCoffee = 209;
 const carbonPizza = 10800 / 8;
@@ -162,6 +159,14 @@ export default function Site({ siteUrl, meta = {} }) {
       }
     })();
   }, [cacheData]);
+
+  function handleOnRequestsAdd() {
+    setRequestsMonthly(requestsMonthly + 1000);
+  }
+
+  function handleOnRequestsSubtract() {
+    setRequestsMonthly(requestsMonthly - 1000);
+  }
   
   return (
     <Layout>
@@ -174,7 +179,7 @@ export default function Site({ siteUrl, meta = {} }) {
 
 
       {isLoading && !error && (
-        <Section>
+        <Section className={styles.siteHeroSection}>
           <Container className={styles.siteContainer} size="narrow">
             <SectionTitle>
               Scanning your site!
@@ -186,7 +191,7 @@ export default function Site({ siteUrl, meta = {} }) {
             )}
             {siteImages && (
               <SectionText color="white" weight="semibold" size="small">
-                Found {siteImages.length} images, calculating emissions...
+                Found <strong>{siteImages.length}</strong> images, calculating emissions...
               </SectionText>
             )}
           </Container>
@@ -195,8 +200,8 @@ export default function Site({ siteUrl, meta = {} }) {
 
       {!isLoading && !error && (
         <>
-          <Section>
-            <Container className={styles.siteContainer} size="narrow">
+          <Section className={styles.siteHeroSection}>
+            <Container className={`${styles.siteContainer} ${styles.siteHeroContainer}`} size="narrow">
               <SectionText color="white" weight="semibold" size="small">
                 Your website produced <strong>{ totalCo2Original?.toFixed(3) }g</strong> of carbon from images alone.
               </SectionText>
@@ -246,9 +251,25 @@ export default function Site({ siteUrl, meta = {} }) {
 
           <Section>
             <Container className={`${styles.siteContainer}`} size="narrow">
-              <SectionText color="white" weight="semibold" size="small">
-                Now assuming you get <strong>{ addCommas(requestsMonthly) }</strong> unique visitors per month...
-              </SectionText>
+              <div className={styles.assuming}>
+                <SectionText color="white" weight="semibold" size="small">
+                  Now assuming you get
+                </SectionText>
+                <div className={styles.assumingCounter}>
+                  <button className={styles.assumingCounterButton} onClick={handleOnRequestsAdd}>
+                    <FaPlusCircle />
+                  </button>
+                  <SectionTitle as="span">
+                    <strong>{ addCommas(requestsMonthly) }</strong>
+                  </SectionTitle> 
+                  <button className={styles.assumingCounterButton} onClick={handleOnRequestsSubtract}>
+                    <FaMinusCircle />
+                  </button>
+                </div>
+                <SectionText color="white" weight="semibold" size="small">
+                  unique visitors per month...
+                </SectionText>
+              </div>
 
               <SectionTitle as="h2">
                 How much <strong>carbon</strong> is that <strong>per year</strong>?
@@ -396,12 +417,15 @@ export default function Site({ siteUrl, meta = {} }) {
                           </ul>
                         </div>
                       </div>
-                      <p className={styles.breakdownUrl}>
-                        <a href={image?.original.url} title={image?.original.url}>{ image?.original.url }</a>
-                      </p>
-                      <p className={styles.breakdownUrl}>
-                        <a href={image?.optimized.url} title={image?.optimized.url}>{ image?.optimized.url }</a>
-                      </p>
+
+                      <ul className={styles.breakdownUrls}>
+                        <li>
+                          Original: <a href={image?.original.url} title={image?.original.url}>{ image?.original.url }</a>
+                        </li>
+                        <li>
+                          Optimized: <a href={image?.optimized.url} title={image?.optimized.url}>{ image?.optimized.url }</a>
+                        </li>
+                      </ul>
                     </li>
                   )
                 })}

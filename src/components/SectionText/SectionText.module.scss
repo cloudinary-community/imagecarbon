@@ -5,7 +5,7 @@
   font-size: 1.2em;
   font-weight: $text-weight-normal;
   text-align: center;
-  margin: 2em 0;
+  margin: 1em 0;
 
   @media (min-width: $breakpoint-medium) {
     font-size: 1.5em;
@@ -27,6 +27,7 @@
   &[data-text-size="small"] {
 
     font-size: 1em;
+    margin: 1.2em 0;
 
     @media (min-width: $breakpoint-medium) {
       font-size: 1.2em;

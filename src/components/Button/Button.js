@@ -22,7 +22,7 @@ const Button = ({children, href, className, ...rest}) => {
       );
     }
     return (
-      <a href={href} {...buttonProps}>
+      <a href={href} rel="noreferrer noopener" {...buttonProps}>
         {children}
       </a>
     );

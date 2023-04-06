@@ -21,7 +21,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Section>
+      <Section className={styles.homeHeroSection}>
         <Container className={styles.homeContainer} size="narrow">
           <SectionTitle>
             What&apos;s the <strong>carbon</strong> footprint of the <strong>images</strong> on your website?
@@ -149,18 +149,22 @@ export default function Home() {
             Submit your website at the top of bottom of this page and we&apos;ll do the work to figure out the impact the images on your website are having on the environment.
           </SectionText>
 
-          <ul>
+          <ul className={styles.gettingStarted}>
             <li>
-              <FaLink /> Enter your website address.
+              <span className={styles.gettingStartedIcon}><FaLink /></span>
+              <span className={styles.gettingStartedText}>Enter your website address.</span>
             </li>
             <li>
-              <FaSearch /> We&apos;ll find the images by rendering the page and parsing the result.
+              <span className={styles.gettingStartedIcon}><FaSearch /></span>
+              <span className={styles.gettingStartedText}>We&apos;ll find the images by rendering the page and parsing the result.</span>
             </li>
             <li>
-              <FaChartPie /> CO2.js from The Green Web Foundation will tell us how much carbon is being emitted.
+              <span className={styles.gettingStartedIcon}><FaChartPie /></span>
+              <span className={styles.gettingStartedText}>CO2.js from The Green Web Foundation will tell us how much carbon is being emitted.</span>
             </li>
             <li>
-              <FaImage /> We&apos;ll see how much CO2 you can reduce by optimizing your images
+              <span className={styles.gettingStartedIcon}><FaImage /></span>
+              <span className={styles.gettingStartedText}>We&apos;ll see how much CO2 you can reduce by optimizing your images</span>
             </li>
           </ul>
         </Container>

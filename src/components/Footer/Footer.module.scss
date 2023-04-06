@@ -3,8 +3,8 @@
 .footer {
   width: 100%;
   color: white;
-  background-color: $color-blue-dark;
-  padding: 1.2em 0;
+  text-align: center;
+  padding: 3em 0;
 
   a {
     color: inherit;
@@ -76,7 +76,54 @@
 }
 
 .footerLegal {
+  
   a {
     text-decoration: underline;
   }
+
+}
+
+.builtWith {
+  
+  color: $color-brand-eggshell;
+  text-align: center;
+  margin: 2em 0;
+
+  p {
+
+    font-size: 1.1em;
+    margin-bottom: 1em; 
+
+    a {
+      
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+
+    }
+
+  }
+
+  path {
+    fill: $color-brand-eggshell;
+  }
+
+}
+
+.builtWithLogos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1em;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.note {
+  color: $color-text-note;
+  font-size: .9em;
 }

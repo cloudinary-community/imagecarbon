@@ -2,14 +2,16 @@
 
 .header {
 
+  display: flex;
+  align-items: center;
   width: 100%;
+  height: 3rem; // Rem to allow for calculation with hero height
   font-size: 1em;
   color: $color-brand-gray-light;
-  padding: .5em 0;
   margin: 0;
 
   @media (min-width: $breakpoint-medium) {
-    padding: 1em 0;
+    height: 4em;
   }
 
 }

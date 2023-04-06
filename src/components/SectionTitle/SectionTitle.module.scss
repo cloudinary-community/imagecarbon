@@ -6,6 +6,10 @@
   text-align: center;
   margin: .5em 0;
 
+  strong {
+    color: $color-brand-yellow;
+  }
+
   @media (min-width: $breakpoint-medium) {
     font-size: 3em;
   }
