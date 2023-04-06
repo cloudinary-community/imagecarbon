@@ -164,7 +164,8 @@ export default function Home() {
             </li>
             <li>
               <span className={styles.gettingStartedIcon}><FaChartPie /></span>
-              <span className={styles.gettingStartedText}>CO2.js from The Green Web Foundation will tell us how much carbon is being emitted.</span>
+              <span className={styles.gettingStartedText}>
+                <a href="https://developers.thegreenwebfoundation.org/co2js/overview/" rel="noopener">CO2.js from The Green Web Foundation</a> will tell us how much carbon is being emitted.</span>
             </li>
             <li>
               <span className={styles.gettingStartedIcon}><FaImage /></span>

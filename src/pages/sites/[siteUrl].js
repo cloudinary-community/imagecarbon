@@ -5,6 +5,7 @@ import { FaPizzaSlice, FaCoffee, FaGasPump, FaPlusCircle, FaMinusCircle } from '
 
 import { cleanUrl, restoreUrl, deduplicateArrayByKey, addCommas } from '@/lib/util';
 import { getSignedImageUrl } from '@/lib/cloudinary-server';
+import { formatDate } from '@/lib/datetime';
 
 import useCollect from '@/hooks/use-collect';
 
@@ -24,12 +25,15 @@ const carbonPizza = 10800 / 8;
 const REQUESTS_MONTHLY_INITIAL = 1000;
 const REQUESTS_MONTHLY_INCREMENT = 10000;
 
+const ALREADY_OPTIMIZED_SIZE_THRESHOLD = 5000;
+
 export default function Site({ siteUrl, meta = {} }) {
   const { screenshotUrl } = meta;
 
   const collection = useCollect({ siteUrl });
 
   const {
+    dateCollected,
     error,
     isLoading,
     siteImages,
@@ -39,6 +43,8 @@ export default function Site({ siteUrl, meta = {} }) {
     totalCo2Original,
     totalCo2Savings,
   } = collection;
+
+  const lastRefreshed = formatDate(dateCollected);
 
   const [requestsMonthly, setRequestsMonthly] = useState(REQUESTS_MONTHLY_INITIAL);
   const [showAllImages, setShowAllImages] = useState(false);
@@ -160,7 +166,7 @@ export default function Site({ siteUrl, meta = {} }) {
                   )}
                   <figcaption>
                     <p><a href={siteUrl}>{ siteUrl }</a></p>
-                    {/* <p>Last Refreshed: </p> */}
+                    <p>Last Refreshed: { lastRefreshed }</p>
                   </figcaption>
                 </figure>
                 <div className={styles.previewStats}>
@@ -292,6 +298,9 @@ export default function Site({ siteUrl, meta = {} }) {
               
               <ul className={styles.breakdownImages}>
                 {activeImages && activeImages.map(image => {
+
+                  const isAlreadyOptimized = image.original?.size <= image.optimized?.size + ALREADY_OPTIMIZED_SIZE_THRESHOLD;
+
                   const estimatedSizeSavings = Math.ceil((image.original?.size - image.optimized?.size) / 1000);
                   const estimatedCarbonSavings = Math.ceil((image.original?.co2 - image.optimized?.co2) / 1000);
 
@@ -341,6 +350,14 @@ export default function Site({ siteUrl, meta = {} }) {
                           </div>
                         </div>
                         <div className={styles.breakdownMeta}>
+                          {isAlreadyOptimized && (
+                            <>
+                              <h3>Nice work!</h3>
+                              <p>
+                                Seems like you are already optimizing your images.
+                              </p>
+                            </>
+                          )}
                           <h3>You could save...</h3>
 
                           <p className={styles.breakdownMetaSavings}>

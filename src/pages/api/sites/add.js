@@ -54,7 +54,8 @@ export default async function handler(req, res) {
     }
 
     res.status(200).json({
-      images
+      images,
+      dateCollected
     });
   } catch(e) {
     console.log(`[${siteUrl}] Failed to add site: ${e.message}`);

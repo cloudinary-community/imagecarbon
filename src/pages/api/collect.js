@@ -1,9 +1,10 @@
 import pLimit from 'p-limit';
 import { co2, hosting } from '@tgwf/co2';
+import { constructCloudinaryUrl } from '@cloudinary-util/url-loader';
 
 import { getCloudinary } from '@/lib/cloudinary-server';
 import { cleanUrl, getFileSize } from '@/lib/util';
-import { constructCloudinaryUrl } from '@cloudinary-util/url-loader';
+import { isCloudinaryUrl } from '@/lib/cloudinary';
 
 const cloudinary = getCloudinary();
 const emissions = new co2({ model: 'swd' });
@@ -17,10 +18,20 @@ export default async function handler(req, res) {
   const { images } = body;
   const siteUrl = cleanUrl(body.siteUrl);
 
-  console.log(emissions.perVisit(1).toFixed(2));
+  const imageUrls = images.map(image => {
+    // Because we're using AVIF as our optimization model, we want to make sure we're comparing
+    // the same thing between original and optimized. Because f_auto will serve AVIF whereever
+    // possible, we assume and force a format of f_avif otherwise because we're not making
+    // a browser request, it may not return the image results in avif format
+
+    if ( isCloudinaryUrl(image) ) {
+      return image.replace('f_auto', 'f_avif');
+    }
+    return image;
+  });
 
   try {
-    const imagesQueue = images.map(image => {
+    const imagesQueue = imageUrls.map(image => {
       return limit(() => {
         async function upload() {
           try {
@@ -100,6 +111,7 @@ export default async function handler(req, res) {
 
     res.status(200).json({
       siteUrl,
+      date: new Date(Date.now()).toISOString(),
       images: results
     });
   } catch(e) {

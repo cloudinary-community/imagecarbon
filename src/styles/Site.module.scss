@@ -113,9 +113,13 @@
     text-align: center;
     margin-top: .8em;
 
+    p,
+    a {
+      color: $color-text-note;
+    }
+    
     a {
       
-      color: $color-text-note;
       text-decoration: none;
 
       &:hover {

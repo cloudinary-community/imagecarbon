@@ -6,11 +6,11 @@ export default async function handler(req, res) {
   const siteUrl = cleanUrl(req.query.url);
   
   try {
-    const site = await getSiteByUrl(siteUrl);
+    const { dateCollected } = await getSiteByUrl(siteUrl);
 
-    const shouldRefresh = site && new Date(Date.now()) > new Date(site.dateCollected).getTime() + SCRAPING_CACHE_TIME;
+    const shouldRefresh = dateCollected && new Date(Date.now()) > new Date(dateCollected).getTime() + SCRAPING_CACHE_TIME;
 
-    if ( !site || shouldRefresh ) {
+    if ( !dateCollected || shouldRefresh ) {
       res.status(200).json({});
       return;
     }
@@ -18,6 +18,7 @@ export default async function handler(req, res) {
     const images = await getImagesBySiteUrl(siteUrl);
 
     res.status(200).json({
+      dateCollected,
       images
     });
   } catch(e) {

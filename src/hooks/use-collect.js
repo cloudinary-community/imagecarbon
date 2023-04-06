@@ -11,6 +11,7 @@ export default function useCollect({ siteUrl }) {
   const { data: cacheData, error: cacheError, isLoading: cacheIsLoading = true } = useSWR(`/api/sites/cache?url=${siteUrl}`, fetcher);
 
   const [siteImages, setSiteImages] = useState();
+  const [dateCollected, setDateCollected] = useState();
   // Default the loading state to true as the first action the page will take is the scrape
   // if not cached
   const [scrapeIsLoading, setScrapeIsLoading] = useState(true);
@@ -49,6 +50,7 @@ export default function useCollect({ siteUrl }) {
       });
       
       setSiteImages(images);
+      setDateCollected(cacheData.dateCollected);
       setScrapeComplete(true);
       setScrapeIsLoading(false);
 
@@ -87,6 +89,7 @@ export default function useCollect({ siteUrl }) {
 
         console.log(`Collected image data and emissions results.`)
 
+        setDateCollected('Just Now');
         setSiteImages(imagesResults);
         setScrapeComplete(true);
 
@@ -111,6 +114,7 @@ export default function useCollect({ siteUrl }) {
   return {
     error,
     isLoading: scrapeIsLoading || cacheIsLoading,
+    dateCollected,
     siteImages,
     totalBytesOptimized,
     totalBytesOriginal,
