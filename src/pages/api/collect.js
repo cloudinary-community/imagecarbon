@@ -6,7 +6,7 @@ import { cleanUrl, getFileSize } from '@/lib/util';
 import { constructCloudinaryUrl } from '@cloudinary-util/url-loader';
 
 const cloudinary = getCloudinary();
-const emissions = new co2();
+const emissions = new co2({ model: 'swd' });
 
 const OPTIMIZED_FORMAT = 'avif';
 
@@ -16,6 +16,8 @@ export default async function handler(req, res) {
   const body = JSON.parse(req.body);
   const { images } = body;
   const siteUrl = cleanUrl(body.siteUrl);
+
+  console.log(emissions.perVisit(1).toFixed(2));
 
   try {
     const imagesQueue = images.map(image => {

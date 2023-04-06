@@ -160,6 +160,7 @@
 }
 
 .assumingCounterButton {
+
   display: flex;
   justify-content: center;
   align-items: center;
@@ -168,6 +169,18 @@
   background: none;
   border: none;
   cursor: pointer;
+
+  &:hover {
+    color: white;
+    transform: scale(1.1);
+    transition: transform .1s ease-in-out;
+  }
+
+  &:active {
+    transform: scale(.95);
+    transition: transform .1s ease-in-out;
+  }
+
 }
 
 .iconGrid {

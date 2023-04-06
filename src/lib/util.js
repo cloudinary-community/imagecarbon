@@ -86,15 +86,13 @@ export function isValidUrl(string) {
  * @via Thanks ChatGPT
  */
 
-export function addCommas(num) {
-  // Convert the number to a string
-  num = num.toString();
+export function addCommas(number) {
+  if ( !['string', 'number'].includes(typeof number) ) return number;
 
-  // Split the string into an array of digits
-  var digits = num.split("");
-
-  // Initialize a counter variable
-  var counter = 0;
+  const num = `${number}`;
+  const [whole, decimal] = num.split('.');
+  let digits = whole.split('');
+  let counter = 0;
 
   // Iterate through the digits from right to left
   for (var i = digits.length - 1; i >= 0; i--) {
@@ -107,6 +105,11 @@ export function addCommas(num) {
     }
   }
 
-  // Join the array back into a string and return it
-  return digits.join("");
+  digits = digits.join('');
+
+  if ( decimal ) {
+    digits = `${digits}.${decimal}`;
+  }
+
+  return digits;
 }

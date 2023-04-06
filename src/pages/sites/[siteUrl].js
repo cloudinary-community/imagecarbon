@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Head from 'next/head';
 import { CldImage } from 'next-cloudinary';
-import useSWR from 'swr';
 import { FaPizzaSlice, FaCoffee, FaGasPump, FaPlusCircle, FaMinusCircle } from 'react-icons/fa';
 
-import { restoreUrl, addNumbers, deduplicateArrayByKey, addCommas } from '@/lib/util';
+import { cleanUrl, restoreUrl, deduplicateArrayByKey, addCommas } from '@/lib/util';
 import { getSignedImageUrl } from '@/lib/cloudinary-server';
-import { scrapeImagesFromWebsite } from '@/lib/scraping';
+
+import useCollect from '@/hooks/use-collect';
 
 import Layout from '@/components/Layout';
 import Section from '@/components/Section';
@@ -18,8 +18,6 @@ import Button from '@/components/Button';
 
 import styles from '@/styles/Site.module.scss'
 
-const fetcher = (url) => fetch(url).then((res) => res.json());
-
 const carbonGasoline = 8887;
 const carbonCoffee = 209;
 const carbonPizza = 10800 / 8;
@@ -27,32 +25,23 @@ const carbonPizza = 10800 / 8;
 export default function Site({ siteUrl, meta = {} }) {
   const { screenshotUrl } = meta;
 
-  const [error, setError] = useState();
+  const collection = useCollect({ siteUrl });
+
+  const {
+    error,
+    isLoading,
+    siteImages,
+    totalBytesOptimized,
+    totalBytesOriginal,
+    totalCo2Optimized,
+    totalCo2Original,
+    totalCo2Savings,
+  } = collection;
+
   const [requestsMonthly, setRequestsMonthly] = useState(10000);
-  const [siteImages, setSiteImages] = useState();
+  const [showAllImages, setShowAllImages] = useState(false);
 
   const requestsYearly = requestsMonthly * 12;
-
-  // Default the loading state to true as the first action the page will take is the scrape
-  // if not cached
-  const [scrapeIsLoading, setScrapeIsLoading] = useState(true);
-
-  // Default the cache loading state to true so we don't show the site until we know it's cached
-  const { data: cacheData, error: cacheError, isLoading: cacheIsLoading = true } = useSWR(`/api/sites/cache?url=${siteUrl}`, fetcher);
-  
-  const isLoading = scrapeIsLoading || cacheIsLoading;
-  const isOptimized = siteImages?.filter(({ optimized }) => !!optimized)?.length > 0;
-
-  // Total number of bytes the original images weigh
-
-  const totalBytesOriginal = siteImages ? addNumbers(siteImages?.map(({ original }) => original.size)) : undefined;
-  const totalBytesOptimized = siteImages && isOptimized ? addNumbers(siteImages?.map(({ optimized }) => optimized.size)) : undefined;
-
-  // Estimated emissions
-
-  const totalCo2Original = siteImages ? addNumbers(siteImages?.map(({ original }) => original.co2)) : undefined;
-  const totalCo2Optimized = siteImages && isOptimized ? addNumbers(siteImages?.map(({ optimized }) => optimized.co2)) : undefined;
-  const totalCo2Savings = totalCo2Original && totalCo2Optimized && Math.ceil(100 - (totalCo2Optimized / totalCo2Original * 100));
 
   // Construct an array of images that actually make sense to show, with
   // non negligible sizes and deduplication
@@ -81,84 +70,11 @@ export default function Site({ siteUrl, meta = {} }) {
 
   activeImages?.sort((a, b) => b.savingsCarbon - a.savingsCarbon);
 
+  if ( !showAllImages ) {
+    activeImages = activeImages?.slice(0, 3);
+  }
+
   const numberHiddenImages = activeImages && siteImages.length - activeImages.length;
-
-  useEffect(() => {
-    if ( typeof cacheData === 'undefined' && !cacheError ) return;
-
-    setError(false);
-
-    console.log(`Begin scraping ${siteUrl}...`);
-
-    if ( cacheData.images ) {
-      console.log(`Cache found! Restoring ${cacheData.images.length} images.`)
-
-      const images = cacheData.images.map(image => {
-        return {
-          ...image,
-          optimized: JSON.parse(image.optimized),
-          original: JSON.parse(image.original),
-          uploaded: JSON.parse(image.uploaded)
-        }
-      });
-      
-      setSiteImages(images);
-      setScrapeIsLoading(false);
-
-      return;
-    }
-
-    (async function run() {
-      try {
-        setScrapeIsLoading(true);
-
-        // First grab all of the images from the passed in URL
-
-        let { images } = await scrapeImagesFromWebsite({
-          siteUrl
-        });
-
-        console.log(`Found ${images?.length} images.`)
-
-        images = images.map(image => {
-          return {
-            original: {
-              url: image.url
-            }
-          };
-        });
-
-        setSiteImages(images);
-
-        const { images: imagesResults } = await fetch('/api/collect', {
-          method: 'POST',
-          body: JSON.stringify({
-            images: images.map(({ original }) => original.url),
-            siteUrl
-          })
-        }).then(r => r.json());
-
-        console.log(`Collected image data and emissions results.`)
-
-        setSiteImages(imagesResults);
-
-        setScrapeIsLoading(false);
-
-        await fetch('/api/sites/add', {
-          method: 'POST',
-          body: JSON.stringify({
-            images: imagesResults,
-            siteUrl
-          })
-        }).then(r => r.json());
-
-        console.log(`Added site to cache for next time!`)
-      } catch(e) {
-        setError(e.message);
-        console.log(`Something went wrong! ${e.message}`);
-      }
-    })();
-  }, [cacheData]);
 
   function handleOnRequestsAdd() {
     setRequestsMonthly(requestsMonthly + 1000);
@@ -167,14 +83,18 @@ export default function Site({ siteUrl, meta = {} }) {
   function handleOnRequestsSubtract() {
     setRequestsMonthly(requestsMonthly - 1000);
   }
+
+  function handleShowMoreImages() {
+    setShowAllImages(true);
+  }
   
   return (
     <Layout>
       <Head>
-        <title>Image Carbon</title>
-        <meta name="description" content="Image Carbon" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
+        <title>{`Results for ${cleanUrl(siteUrl)} - Image Carbon`}</title>
+        <meta name="description" content={`Find out how much emissions ${cleanUrl(siteUrl)} produces from images alone!`} />
+        <meta name="og:title" content={`${cleanUrl(siteUrl)} on Image Carbon`} />
+        <meta name="og:description" content={`How does ${cleanUrl(siteUrl)} stack up with optimizing for the web?`} />
       </Head>
 
 
@@ -203,7 +123,7 @@ export default function Site({ siteUrl, meta = {} }) {
           <Section className={styles.siteHeroSection}>
             <Container className={`${styles.siteContainer} ${styles.siteHeroContainer}`} size="narrow">
               <SectionText color="white" weight="semibold" size="small">
-                Your website produced <strong>{ totalCo2Original?.toFixed(3) }g</strong> of carbon from images alone.
+                Your website produced <strong>{ totalCo2Original && addCommas(totalCo2Original.toFixed(2)) }g</strong> of carbon from images alone.
               </SectionText>
 
               <SectionTitle>
@@ -233,7 +153,7 @@ export default function Site({ siteUrl, meta = {} }) {
 
                     <ul>
                       <li>Total Size of Images: <span>{ totalBytesOriginal && Math.ceil(totalBytesOriginal / 1000) }kb</span></li>
-                      <li>Est. CO2: <span>{ totalCo2Original?.toFixed(3) }g</span></li>
+                      <li>Est. CO2: <span>{ totalCo2Original?.toFixed(2) }g</span></li>
                     </ul>
                   </div>
                   <div>
@@ -241,7 +161,7 @@ export default function Site({ siteUrl, meta = {} }) {
 
                     <ul>
                       <li>Total Size of Images: <span>{ totalBytesOptimized && Math.ceil(totalBytesOptimized / 1000) }kb</span></li>
-                      <li>Est. CO2: <span>{ totalCo2Optimized?.toFixed(3) }g</span></li>
+                      <li>Est. CO2: <span>{ totalCo2Optimized?.toFixed(2) }g</span></li>
                     </ul>
                   </div>
                 </div>
@@ -269,6 +189,9 @@ export default function Site({ siteUrl, meta = {} }) {
                 <SectionText color="white" weight="semibold" size="small">
                   unique visitors per month...
                 </SectionText>
+                <SectionText size="tiny">
+                = { addCommas(requestsMonthly * 12) } requests per year
+                </SectionText>
               </div>
 
               <SectionTitle as="h2">
@@ -276,11 +199,11 @@ export default function Site({ siteUrl, meta = {} }) {
               </SectionTitle>
               
               <SectionText color="white" weight="semibold" size="small">
-                Producing <strong>{ totalCo2Original?.toFixed(3) * requestsMonthly }g</strong> is like the equivalent of...
+                Producing <strong>{ addCommas((totalCo2Original * requestsMonthly)?.toFixed(2)) }g</strong> is like the equivalent of...
               </SectionText>
 
               <SectionText size="tiny">
-                { totalCo2Original?.toFixed(3) }g x { addCommas(requestsMonthly) } = { totalCo2Original?.toFixed(3) * requestsMonthly }g
+                { addCommas(totalCo2Original?.toFixed(2)) }g x { addCommas(requestsMonthly) } = { addCommas((totalCo2Original * requestsMonthly)?.toFixed(2)) }g
               </SectionText>
 
               <div className={styles.iconGrid}>
@@ -377,7 +300,7 @@ export default function Site({ siteUrl, meta = {} }) {
                               Size: { image.original?.size && Math.ceil(image.original?.size / 1000) }kb
                             </p>
                             <p>
-                              Carbon: { image.original?.co2?.toFixed(3) }g
+                              Carbon: { image.original?.co2?.toFixed(2) }g
                             </p>
                           </div>
                           <div>
@@ -397,7 +320,7 @@ export default function Site({ siteUrl, meta = {} }) {
                               Size: { image.optimized?.size && Math.ceil(image.optimized?.size / 1000) }kb
                             </p>
                             <p>
-                              Carbon: { image.optimized?.co2?.toFixed(3) }g
+                              Carbon: { image.optimized?.co2?.toFixed(2) }g
                             </p>
                           </div>
                         </div>
@@ -434,11 +357,52 @@ export default function Site({ siteUrl, meta = {} }) {
                   )
                 })}
               </ul>
+              {!showAllImages && (
+                <p>
+                  <Button onClick={handleShowMoreImages}>Show More Images</Button>
+                </p>
+              )}
               {typeof numberHiddenImages === 'number' && numberHiddenImages > 0 && (
                 <SectionText className={styles.breakdownHidden} size="tiny" color="note">
                   <strong>{ numberHiddenImages }</strong> images not shown due to deduplication or smaller than 5kb in size.
                 </SectionText>
               )}
+            </Container>
+          </Section>
+          <Section>
+            <Container>
+              <SectionTitle as="h2">
+                What you&apos;re doing right...
+              </SectionTitle>
+              
+              <SectionText size="small">
+                Text
+              </SectionText>
+
+            </Container>
+          </Section>
+          <Section>
+            <Container>
+              <SectionTitle as="h2">
+                What Else You Could be Doing...
+              </SectionTitle>
+              
+              <SectionText size="small">
+                Text
+              </SectionText>
+
+            </Container>
+          </Section>
+          <Section>
+            <Container>
+              <SectionTitle as="h2">
+                More Resources to Learn
+              </SectionTitle>
+              
+              <SectionText size="small">
+                Text
+              </SectionText>
+
             </Container>
           </Section>
           <Section id="check-another-site">
@@ -494,7 +458,9 @@ export async function getStaticProps({ params }) {
     gravity: 'north',
     height: 600,
     width: 800,
-    crop: 'fill'
+    crop: 'fill',
+    fetch_format: 'auto',
+    quality: 'auto'
   });
 
   return {

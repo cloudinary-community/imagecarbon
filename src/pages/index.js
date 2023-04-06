@@ -15,10 +15,10 @@ export default function Home() {
   return (
     <Layout>
       <Head>
-        <title>Image Carbon</title>
-        <meta name="description" content="Image Carbon" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
+        <title>Image Carbon - Optimize Images, Save the Planet</title>
+        <meta name="description" content="Reduce your carbon footprint with ImageCarbon! Learn how image optimization can lower carbon emissions and make a sustainable web." />
+        <meta name="og:title" content="Optimize Images, Save the Planet with Image Carbon" />
+        <meta name="og:description" content="Reduce your carbon footprint with ImageCarbon! Learn how image optimization can lower carbon emissions and make a sustainable web." />
       </Head>
 
       <Section className={styles.homeHeroSection}>
@@ -130,7 +130,11 @@ export default function Home() {
           </div>
 
           <SectionText>
-            <strong>99.88% of images are not being sent in the optimal format!</strong>
+            <strong>
+              <a href="https://almanac.httparchive.org/en/2022/sustainability#format-webpavif" rel="noopener">
+                99.88% of images are not being sent in the optimal format!
+              </a>
+            </strong>
           </SectionText>
 
           <SectionText size="small">
