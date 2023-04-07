@@ -16,8 +16,8 @@ const Layout = ({ children }) => {
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <link rel="manifest" href="/site.webmanifest" />
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#333533" />
-        <meta name="msapplication-TileColor" content="#eecc6e" />
-        <meta name="theme-color" content="#eecc6e" />
+        <meta name="msapplication-TileColor" content="#333533" />
+        <meta name="theme-color" content="#ffffff" />
       </Head>
       <Header />
       <main className={styles.main}>{children}</main>
