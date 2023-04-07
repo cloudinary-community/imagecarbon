@@ -6,8 +6,8 @@ export async function scrapingBeeRequest({ url, extractRules }) {
   const params = {
     api_key: process.env.SCRAPINGBEE_API_KEY,
     url,
-    extract_rules: JSON.stringify(),
-    wait: '1000'
+    extract_rules: undefined,
+    wait_browser: 'domcontentloaded'
   };
 
   if ( extractRules) {

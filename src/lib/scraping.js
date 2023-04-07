@@ -31,8 +31,7 @@ export async function findSiteImagesByUrl(url) {
           loading: 'img@loading',
         }
       }
-    },
-    wait_browser: 'domcontentloaded'
+    }
   });
   
   if ( error ) {

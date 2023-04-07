@@ -2,8 +2,13 @@
  * cleanUrl
  */
 
-export function cleanUrl(url) {
+export function cleanUrl(url, { removeQueryParams = false } = {}) {
   if ( typeof url !== 'string' ) return url;
+
+  if ( removeQueryParams ) {
+    url = url.split('?')[0];
+  }
+
   return url.toLowerCase().replace(/http?s:\/\//, '').replace(/\/$/, '')
 }
 

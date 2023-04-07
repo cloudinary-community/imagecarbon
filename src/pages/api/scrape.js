@@ -1,5 +1,5 @@
 import { findSiteImagesByUrl } from '@/lib/scraping';
-import { cleanUrl } from '@/lib/util';
+import { cleanUrl, restoreUrl } from '@/lib/util';
 
 export const config = {
   runtime: 'edge',
@@ -39,13 +39,14 @@ export default async function handler(res) {
     images = images && await Promise.all(images.map(async (image) => {
       const { src, loading } = image;
 
+      const host = restoreUrl(cleanUrl(siteUrl, { removeQueryParams: true }));
       let url = src;
 
       if ( !url.startsWith('http') ) {
         if ( !url.startsWith('/') ) {
           url = `/${url}`;
         }
-        url = `${siteUrl}${url}`;
+        url = `${host}${url}`;
       }
 
       return {

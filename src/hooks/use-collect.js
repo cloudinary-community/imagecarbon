@@ -20,8 +20,8 @@ export default function useCollect({ siteUrl }) {
 
   // Total number of bytes the original images weigh
 
-  const totalBytesOriginal = siteImages && scrapeComplete ? addNumbers(siteImages?.map(({ original }) => original.size)) : undefined;
-  const totalBytesOptimized = siteImages && scrapeComplete ? addNumbers(siteImages?.map(({ optimized }) => optimized.size)) : undefined;
+  const totalBytesOriginal = siteImages && scrapeComplete ? addNumbers(siteImages?.map(({ original }) => original?.size)) : undefined;
+  const totalBytesOptimized = siteImages && scrapeComplete ? addNumbers(siteImages?.map(({ optimized }) => optimized?.size)) : undefined;
 
   // Estimated emissions
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { CldImage } from 'next-cloudinary';
 import { FaPizzaSlice, FaCoffee, FaGasPump, FaPlusCircle, FaMinusCircle } from 'react-icons/fa';
@@ -49,6 +49,8 @@ export default function Site({ siteUrl, meta = {} }) {
   const [requestsMonthly, setRequestsMonthly] = useState(REQUESTS_MONTHLY_INITIAL);
   const [showAllImages, setShowAllImages] = useState(false);
 
+  const isSiteAlreadyOptimized = dateCollected && totalBytesOriginal <= totalBytesOptimized + ALREADY_OPTIMIZED_SIZE_THRESHOLD;
+
   const requestsYearly = requestsMonthly * 12;
 
   // Construct an array of images that actually make sense to show, with
@@ -83,6 +85,13 @@ export default function Site({ siteUrl, meta = {} }) {
   }
 
   const numberHiddenImages = activeImages && siteImages.length - activeImages.length;
+
+  useEffect(() => {
+    // Preload screenshot image while scraping in progress to help waiting time
+    (async function run() {
+      await fetch(screenshotUrl);
+    })();
+  }, [])
 
   function handleOnRequestsAdd() {
     if ( requestsMonthly === REQUESTS_MONTHLY_INITIAL ) {
@@ -138,16 +147,28 @@ export default function Site({ siteUrl, meta = {} }) {
       )}
 
       {!isLoading && !error && (
-        <>
+        <div data-is-site-optimized={isSiteAlreadyOptimized}>
           <Section className={styles.siteHeroSection}>
             <Container className={`${styles.siteContainer} ${styles.siteHeroContainer}`} size="narrow">
-              <SectionText color="white" weight="semibold" size="small">
-                Your website produced <strong>{ totalCo2Original && addCommas(totalCo2Original.toFixed(2)) }g</strong> of carbon from images alone.
-              </SectionText>
+              
+              {isSiteAlreadyOptimized && (
+                <>
+                  <SectionTitle>
+                    You&apos;re already doing a <strong>great job</strong> optimizing your images!
+                  </SectionTitle>
+                  <SectionText color="white" weight="semibold" size="small">
+                    But your website still produced <strong>{ totalCo2Original && addCommas(totalCo2Original.toFixed(2)) }g</strong> of carbon from images alone.
+                  </SectionText>
+                </>
+              )}
 
-              <SectionTitle>
-                You could reduce <strong>{ totalCo2Savings }%</strong> of the CO2 by <strong>optimizing your images</strong>!
-              </SectionTitle>
+              {!isSiteAlreadyOptimized && (
+                <>
+                  <SectionTitle>
+                    You could reduce <strong>{ totalCo2Savings }%</strong> of the CO2 by <strong>optimizing your images</strong>!
+                  </SectionTitle>
+                </>
+              )}
 
               <SectionText size="small">
                 Estimated using the <a href="https://sustainablewebdesign.org/calculating-digital-emissions/">Sustainable Web Design</a> model.
@@ -171,21 +192,29 @@ export default function Site({ siteUrl, meta = {} }) {
                 </figure>
                 <div className={styles.previewStats}>
                   <div>
-                    <h3>Original</h3>
+                    {!isSiteAlreadyOptimized && (
+                      <h3>Original</h3>
+                    )}
+
+                    {isSiteAlreadyOptimized && (
+                      <h3>Your Site</h3>
+                    )}
 
                     <ul>
                       <li>Total Size of Images: <span>{ totalBytesOriginal && Math.ceil(totalBytesOriginal / 1000) }kb</span></li>
                       <li>Est. CO2: <span>{ totalCo2Original?.toFixed(2) }g</span></li>
                     </ul>
                   </div>
-                  <div>
-                    <h3>Optimized</h3>
+                  {!isSiteAlreadyOptimized && (
+                    <div>
+                      <h3>Optimized</h3>
 
-                    <ul>
-                      <li>Total Size of Images: <span>{ totalBytesOptimized && Math.ceil(totalBytesOptimized / 1000) }kb</span></li>
-                      <li>Est. CO2: <span>{ totalCo2Optimized?.toFixed(2) }g</span></li>
-                    </ul>
-                  </div>
+                      <ul>
+                        <li>Total Size of Images: <span>{ totalBytesOptimized && Math.ceil(totalBytesOptimized / 1000) }kb</span></li>
+                        <li>Est. CO2: <span>{ totalCo2Optimized?.toFixed(2) }g</span></li>
+                      </ul>
+                    </div>
+                  )}
                 </div>
               </div>
             </Container>
@@ -299,7 +328,7 @@ export default function Site({ siteUrl, meta = {} }) {
               <ul className={styles.breakdownImages}>
                 {activeImages && activeImages.map(image => {
 
-                  const isAlreadyOptimized = image.original?.size <= image.optimized?.size + ALREADY_OPTIMIZED_SIZE_THRESHOLD;
+                  const isImageAlreadyOptimized = image.original?.size <= image.optimized?.size + ALREADY_OPTIMIZED_SIZE_THRESHOLD;
 
                   const estimatedSizeSavings = Math.ceil((image.original?.size - image.optimized?.size) / 1000);
                   const estimatedCarbonSavings = Math.ceil((image.original?.co2 - image.optimized?.co2) / 1000);
@@ -328,29 +357,31 @@ export default function Site({ siteUrl, meta = {} }) {
                               Carbon: { image.original?.co2?.toFixed(2) }g
                             </p>
                           </div>
-                          <div>
-                            {image?.optimized?.url && (
-                              <CldImage
-                                key={image.optimized.url}
-                                src={image.optimized.url}
-                                width="800"
-                                height="600"
-                                crop="fill"
-                                gravity="center"
-                                alt={`Optimized image showing results`}
-                                loading="lazy"
-                              />
-                            )}
-                            <p>
-                              Size: { image.optimized?.size && Math.ceil(image.optimized?.size / 1000) }kb
-                            </p>
-                            <p>
-                              Carbon: { image.optimized?.co2?.toFixed(2) }g
-                            </p>
-                          </div>
+                          {!isSiteAlreadyOptimized && (
+                            <div>
+                              {image?.optimized?.url && (
+                                <CldImage
+                                  key={image.optimized.url}
+                                  src={image.optimized.url}
+                                  width="800"
+                                  height="600"
+                                  crop="fill"
+                                  gravity="center"
+                                  alt={`Optimized image showing results`}
+                                  loading="lazy"
+                                />
+                              )}
+                              <p>
+                                Size: { image.optimized?.size && Math.ceil(image.optimized?.size / 1000) }kb
+                              </p>
+                              <p>
+                                Carbon: { image.optimized?.co2?.toFixed(2) }g
+                              </p>
+                            </div>
+                          )}
                         </div>
                         <div className={styles.breakdownMeta}>
-                          {isAlreadyOptimized && (
+                          {isImageAlreadyOptimized && (
                             <>
                               <h3>Nice work!</h3>
                               <p>
@@ -358,19 +389,23 @@ export default function Site({ siteUrl, meta = {} }) {
                               </p>
                             </>
                           )}
-                          <h3>You could save...</h3>
+                          {!isImageAlreadyOptimized && (
+                            <>
+                              <h3>You could save...</h3>
 
-                          <p className={styles.breakdownMetaSavings}>
-                            <strong>{ estimatedSizeSavings }kb</strong> = <strong>{ estimatedCarbonSavings }g</strong>
-                          </p>
+                              <p className={styles.breakdownMetaSavings}>
+                                <strong>{ estimatedSizeSavings }kb</strong> = <strong>{ estimatedCarbonSavings }g</strong>
+                              </p>
 
-                          <p className={styles.breakdownMetaBy}>By...</p>
+                              <p className={styles.breakdownMetaBy}>By...</p>
 
-                          <ul className={styles.breakdownBetaSteps}>
-                            <li>
-                              Optimizing Images
-                            </li>
-                          </ul>
+                              <ul className={styles.breakdownBetaSteps}>
+                                <li>
+                                  Optimizing Images
+                                </li>
+                              </ul>
+                            </>
+                          )}
                         </div>
                       </div>
 
@@ -452,7 +487,7 @@ export default function Site({ siteUrl, meta = {} }) {
               <FormSubmitWebsite />
             </Container>
           </Section>
-        </>
+        </div>
       )}
 
       {error && (
@@ -495,10 +530,6 @@ export async function getStaticProps({ params }) {
     fetch_format: 'auto',
     quality: 'auto'
   });
-
-  // Preload the image to prime it to cache
-
-  await fetch(screenshotUrl);
 
   return {
     props: {

@@ -6,7 +6,7 @@ export default async function handler(req, res) {
   const siteUrl = cleanUrl(req.query.url);
   
   try {
-    const { dateCollected } = await getSiteByUrl(siteUrl);
+    const { dateCollected } = await getSiteByUrl(siteUrl) || {};
 
     const shouldRefresh = dateCollected && new Date(Date.now()) > new Date(dateCollected).getTime() + SCRAPING_CACHE_TIME;
 
