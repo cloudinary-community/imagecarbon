@@ -25,8 +25,8 @@ export default function useCollect({ siteUrl }) {
 
   // Estimated emissions
 
-  const totalCo2Original = siteImages && scrapeComplete ? addNumbers(siteImages?.map(({ original }) => original.co2)) : undefined;
-  const totalCo2Optimized = siteImages && scrapeComplete ? addNumbers(siteImages?.map(({ optimized }) => optimized.co2)) : undefined;
+  const totalCo2Original = siteImages && scrapeComplete ? addNumbers(siteImages?.map(({ original }) => original?.co2)) : undefined;
+  const totalCo2Optimized = siteImages && scrapeComplete ? addNumbers(siteImages?.map(({ optimized }) => optimized?.co2)) : undefined;
   const totalCo2Savings = totalCo2Original && totalCo2Optimized && Math.ceil(100 - (totalCo2Optimized / totalCo2Original * 100));
   
 

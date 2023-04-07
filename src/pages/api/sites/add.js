@@ -29,7 +29,7 @@ export default async function handler(req, res) {
         optimized: JSON.stringify(image.optimized),
         original: JSON.stringify(image.original),
         uploaded: JSON.stringify(image.uploaded),
-        siteUrl,
+        siteUrl
       }
     });
 
@@ -39,18 +39,17 @@ export default async function handler(req, res) {
 
     const dateCollected = new Date(Date.now()).toISOString()
 
+    const siteData = {
+      siteUrl,
+      dateCollected
+    }
+
     if ( site ) {
       // If the site exists, we just want to update the Date Collected record
-      await updateSiteById(site.id, {
-        siteUrl,
-        dateCollected,
-      });
+      await updateSiteById(site.id, siteData);
     } else {
       // Otherwise we want to create the site
-      await createSite({
-        siteUrl,
-        dateCollected
-      });
+      await createSite(siteData);
     }
 
     res.status(200).json({

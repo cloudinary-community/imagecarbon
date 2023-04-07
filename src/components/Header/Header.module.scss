@@ -31,7 +31,20 @@
   margin: 0;
 
   a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     text-decoration: none;
+  }
+
+  svg {
+    width: auto;
+    height: 1.5em;
+    margin-right: .5em;
+  }
+
+  path {
+    fill: $color-brand-gray-light;
   }
 
 }
