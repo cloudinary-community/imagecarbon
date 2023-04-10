@@ -1,34 +1,50 @@
-import { getXataClient } from '@/lib/xata';
-import { cleanUrl } from '@/lib/util';
+/**
+ * collectImageStats
+ */
 
-const xata = getXataClient();
-
-export async function getSites() {
-  return xata.db.Sites.getAll();
+export async function collectImageStats({ images, siteUrl }) {
+  try {
+    const results = await fetch('/api/collect', {
+      method: 'POST',
+      body: JSON.stringify({
+        images,
+        siteUrl
+      })
+    }).then(r => r.json());
+    return results;
+  } catch(e) {
+    throw new Error(`Failed to add site: ${e.message}`);
+  }
 }
 
-export async function getSiteByUrl(url) {
-  const siteUrl = cleanUrl(url);
-  return xata.db.Sites.filter({ siteUrl }).getFirst();
+/**
+ * addSite
+ */
+
+export async function addSite({ images, siteUrl }) {
+  try {
+    const results = await fetch('/api/sites/add', {
+      method: 'POST',
+      body: JSON.stringify({
+        images,
+        siteUrl
+      })
+    }).then(r => r.json());
+    return results;
+  } catch(e) {
+    throw new Error(`Failed to add site: ${e.message}`);
+  }
 }
 
-export async function updateSiteById(id, data) {
-  return xata.db.Sites.update(id, data);
-}
+/**
+ * getCache
+ */
 
-export async function createSite(data) {
-  return xata.db.Sites.create(data);
-}
-
-export async function getImagesBySiteUrl(url) {
-  const siteUrl = cleanUrl(url);
-  return xata.db.Images.filter({ siteUrl }).getAll();
-}
-
-export async function deleteImagesById(ids) {
-  return xata.db.Images.delete(ids);
-}
-
-export async function addImages(images) {
-  return xata.db.Images.create(images);
+export async function getCache({ siteUrl }) {
+  try {
+    const results = await fetch(`/api/sites/cache?url=${siteUrl}`).then(r => r.json());
+    return results;
+  } catch(e) {
+    throw new Error(`Failed get cache: ${e.message}`);
+  }
 }

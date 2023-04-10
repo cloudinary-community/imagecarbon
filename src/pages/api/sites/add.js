@@ -1,5 +1,5 @@
 import { cleanUrl } from '@/lib/util';
-import { getSiteByUrl, updateSiteById, createSite, getImagesBySiteUrl, deleteImagesById, addImages } from '@/lib/sites';
+import { getSiteByUrl, updateSiteById, createSite, getImagesBySiteUrl, deleteImagesById, addImages } from '@/lib/sites-server';
 
 export default async function handler(req, res) {
   const body = JSON.parse(req.body);

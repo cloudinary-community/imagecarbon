@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import { CldOgImage } from 'next-cloudinary'
 
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -19,6 +20,13 @@ const Layout = ({ children }) => {
         <meta name="msapplication-TileColor" content="#333533" />
         <meta name="theme-color" content="#ffffff" />
       </Head>
+
+      <CldOgImage
+        src="imagecarbon-assets/og-default-2400x1200_f9irn4"
+        alt="How much carbon are you producing with your website images? ImageCarbon.com"
+        twitterTitle="Optimize Images, Save the Planet with Image Carbon"
+      />
+
       <Header />
       <main className={styles.main}>{children}</main>
       <Footer />

@@ -1,65 +1,51 @@
 import { useState, useEffect } from 'react';
-import useSWR from 'swr';
 
 import { addNumbers } from '@/lib/util';
+import { collectImageStats, addSite, getCache } from '@/lib/sites';
 import { scrapeImagesFromWebsite } from '@/lib/scraping';
 
-const fetcher = (url) => fetch(url).then((res) => res.json());
-
 export default function useCollect({ siteUrl }) {
-  // Default the cache loading state to true so we don't show the site until we know it's cached
-  const { data: cacheData, error: cacheError, isLoading: cacheIsLoading = true } = useSWR(`/api/sites/cache?url=${siteUrl}`, fetcher);
-
   const [siteImages, setSiteImages] = useState();
   const [dateCollected, setDateCollected] = useState();
   // Default the loading state to true as the first action the page will take is the scrape
   // if not cached
-  const [scrapeIsLoading, setScrapeIsLoading] = useState(true);
-  const [scrapeComplete, setScrapeComplete] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isComplete, setIsComplete] = useState(false);
   const [error, setError] = useState();
 
-  // Total number of bytes the original images weigh
-
-  const totalBytesOriginal = siteImages && scrapeComplete ? addNumbers(siteImages?.map(({ original }) => original?.size)) : undefined;
-  const totalBytesOptimized = siteImages && scrapeComplete ? addNumbers(siteImages?.map(({ optimized }) => optimized?.size)) : undefined;
-
-  // Estimated emissions
-
-  const totalCo2Original = siteImages && scrapeComplete ? addNumbers(siteImages?.map(({ original }) => original?.co2)) : undefined;
-  const totalCo2Optimized = siteImages && scrapeComplete ? addNumbers(siteImages?.map(({ optimized }) => optimized?.co2)) : undefined;
-  const totalCo2Savings = totalCo2Original && totalCo2Optimized && Math.ceil(100 - (totalCo2Optimized / totalCo2Original * 100));
-  
 
   useEffect(() => {
-    if ( typeof cacheData === 'undefined' && !cacheError ) return;
-
     setError(false);
 
-    console.log(`Begin scraping ${siteUrl}...`);
-
-    if ( cacheData.images ) {
-      console.log(`Cache found! Restoring ${cacheData.images.length} images.`)
-
-      const images = cacheData.images.map(image => {
-        return {
-          ...image,
-          optimized: JSON.parse(image.optimized),
-          original: JSON.parse(image.original),
-          uploaded: JSON.parse(image.uploaded)
-        }
-      });
-      
-      setSiteImages(images);
-      setDateCollected(cacheData.dateCollected);
-      setScrapeComplete(true);
-      setScrapeIsLoading(false);
-
-      return;
-    }
-
     (async function run() {
+      console.log(`[Collect] Begin scraping ${siteUrl}...`);
+
       try {
-        setScrapeIsLoading(true);
+          // Default the cache loading state to true so we don't show the site until we know it's cached
+
+        const { images: cacheImages, dateCollected: cacheDateCollected } = await getCache({ siteUrl });
+
+        if ( cacheImages ) {
+          console.log(`[Collect] Cache found! Restoring ${cacheImages.length} images.`)
+
+          const images = cacheImages.map(image => {
+            return {
+              ...image,
+              optimized: JSON.parse(image.optimized),
+              original: JSON.parse(image.original),
+              uploaded: JSON.parse(image.uploaded)
+            }
+          });
+
+          setSiteImages(images);
+          setDateCollected(cacheDateCollected);
+          setIsComplete(true);
+          setIsLoading(false);
+
+          return;
+        }
+
+        setIsLoading(true);
 
         // First grab all of the images from the passed in URL
 
@@ -67,7 +53,7 @@ export default function useCollect({ siteUrl }) {
           siteUrl
         });
 
-        console.log(`Found ${images?.length} images.`)
+        console.log(`[Collect] Found ${images?.length} images.`)
 
         images = images.map(image => {
           return {
@@ -79,48 +65,46 @@ export default function useCollect({ siteUrl }) {
 
         setSiteImages(images);
 
-        const { images: imagesResults } = await fetch('/api/collect', {
-          method: 'POST',
-          body: JSON.stringify({
-            images: images.map(({ original }) => original.url),
-            siteUrl
-          })
-        }).then(r => r.json());
+        const { images: imagesResults } = await collectImageStats({
+          images: images.map(({ original }) => original.url),
+          siteUrl
+        });
 
-        console.log(`Collected image data and emissions results.`)
+        console.log(`[Collect] Collected image data and emissions results.`)
 
         setDateCollected('Just Now');
         setSiteImages(imagesResults);
-        setScrapeComplete(true);
+        setIsComplete(true);
 
-        setScrapeIsLoading(false);
+        setIsLoading(false);
 
-        await fetch('/api/sites/add', {
-          method: 'POST',
-          body: JSON.stringify({
-            images: imagesResults,
-            siteUrl
-          })
-        }).then(r => r.json());
+        await addSite({
+          images: imagesResults,
+          siteUrl
+        });
 
-        console.log(`Added site to cache for next time!`)
+        console.log(`[Collect] Added site to cache for next time!`)
       } catch(e) {
         setError(e.message);
-        console.log(`Something went wrong! ${e.message}`);
+        console.log(`[Collect] Something went wrong! ${e.message}`);
       }
     })();
-  }, [cacheData]);
+
+    return () => {
+      setSiteImages(undefined);
+      setDateCollected(undefined);
+      setIsLoading(undefined);
+      setIsComplete(undefined);
+      setError(undefined);
+    }
+  }, []);
 
   return {
     error,
-    isLoading: scrapeIsLoading || cacheIsLoading,
+    isLoading,
+    isComplete,
     dateCollected,
     siteImages,
-    totalBytesOptimized,
-    totalBytesOriginal,
-    totalCo2Optimized,
-    totalCo2Original,
-    totalCo2Savings,
   }
 
 }

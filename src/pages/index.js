@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import { CldImage } from 'next-cloudinary'
+import { CldImage, CldOgImage } from 'next-cloudinary'
 import { FaLink, FaSearch, FaChartPie, FaImage } from 'react-icons/fa';
 
 import Layout from '@/components/Layout';
@@ -49,7 +49,7 @@ export default function Home() {
             <CldImage
               width="1200"
               height="742"
-              src="https://almanac.httparchive.org/static/images/2022/sustainability/carbon-emissions-by-percentile.png"
+              src="https://almanac.httparchive.org/static/images/2022/sustainability/number-of-bytes-by-percentile-by-type-mobile.png"
               deliveryType="fetch"
               alt="Graph showing that images are by far the highest contributor to number of bytes transferred on the web."
             />
