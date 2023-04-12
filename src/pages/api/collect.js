@@ -18,6 +18,8 @@ export default async function handler(req, res) {
   const { images } = body;
   const siteUrl = cleanUrl(body.siteUrl);
 
+  console.log(`[Collect] Collecting data for ${siteUrl} with ${images.length} images`);
+
   const imageUrls = images.map(image => {
     // Because we're using AVIF as our optimization model, we want to make sure we're comparing
     // the same thing between original and optimized. Because f_auto will serve AVIF whereever
@@ -56,9 +58,13 @@ export default async function handler(req, res) {
 
     let uploads = await Promise.all(imagesQueue);
     
+    console.log(`[Collect] Uploads complete.`);
+    
     // Filter out failed image upload requests
 
     uploads = uploads.filter(upload => !!upload);
+
+    console.log(`[Collect] ${uploads.length} successful uploads.`);
 
     const hosts = {
       'res.cloudinary.com': await hosting.check('res.cloudinary.com')

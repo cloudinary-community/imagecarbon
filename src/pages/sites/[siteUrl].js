@@ -20,7 +20,8 @@ import styles from '@/styles/Site.module.scss'
 const carbonGasoline = 8887;
 const carbonCoffee = 209;
 const carbonPizza = 10800 / 8;
-const REQUESTS_MONTHLY_INITIAL = 1000;
+const REQUESTS_MONTHLY_MIN = 1000;
+const REQUESTS_MONTHLY_INITIAL = 10000;
 const REQUESTS_MONTHLY_INCREMENT = 10000;
 
 const ALREADY_OPTIMIZED_SIZE_THRESHOLD = 5000;
@@ -83,7 +84,7 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
   const numberHiddenImages = activeImages && siteImages.length - activeImages.length;
 
   function handleOnRequestsAdd() {
-    if ( requestsMonthly === REQUESTS_MONTHLY_INITIAL ) {
+    if ( requestsMonthly === REQUESTS_MONTHLY_MIN ) {
       setRequestsMonthly(REQUESTS_MONTHLY_INCREMENT);
       return;
     }
@@ -91,10 +92,10 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
   }
 
   function handleOnRequestsSubtract() {
-    if ( requestsMonthly === REQUESTS_MONTHLY_INITIAL ) return;
+    if ( requestsMonthly === REQUESTS_MONTHLY_MIN ) return;
 
     if ( requestsMonthly === REQUESTS_MONTHLY_INCREMENT) {
-      setRequestsMonthly(REQUESTS_MONTHLY_INITIAL);
+      setRequestsMonthly(REQUESTS_MONTHLY_MIN);
       return;
     }
 
@@ -219,7 +220,7 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                 <SectionTitle as="span">
                   <strong>{ addCommas(requestsMonthly) }</strong>
                 </SectionTitle>
-                <button className={styles.assumingCounterButton} onClick={handleOnRequestsSubtract} disabled={requestsMonthly === REQUESTS_MONTHLY_INITIAL}>
+                <button className={styles.assumingCounterButton} onClick={handleOnRequestsSubtract} disabled={requestsMonthly === REQUESTS_MONTHLY_MIN}>
                   <FaMinusCircle />
                 </button>
               </div>

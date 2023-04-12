@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
-import { CldImage } from 'next-cloudinary';
 
 import { cleanUrl, restoreUrl } from '@/lib/util';
+import { log } from '@/lib/log';
 
 import useCollect from '@/hooks/use-collect';
 
@@ -22,21 +22,27 @@ export default function Site() {
 
   const siteUrl = restoreUrl(url);
 
-  const { error, siteImages, isLoading, isComplete } = useCollect({ siteUrl });
+  const { error, siteImages, isComplete } = useCollect({ siteUrl });
+
+  log('[Site] Render', { error, siteImages, isComplete });
 
   useEffect(() => {
+    log('[Site] Checking if url parameter exists', { isRead: router.isReady, url });
     // If we pick up the router and we don't have an active URL, redirect
     // back to the homepage as it's likely a navigation error
     if ( router.isReady && !url ) {
+      log('[Site] No URL, redirecting to home');
       router.push('/');
     }
-  }, []);
+  }, [router.isReady, url]);
 
   useEffect(() => {
+    log('[Site] Checking if scraping complete', { isComplete, error, siteUrl });
     if ( !isComplete || error ) return;
     const redirect = cleanUrl(siteUrl);
+    log(`[Site] Scraping complete, redirecting to: ${redirect}`);
     router.push(`/sites/${encodeURIComponent(redirect)}`);
-  }, [siteImages, isLoading])
+  }, [ isComplete, error, siteUrl])
 
   return (
     <Layout>

@@ -12,6 +12,7 @@
     "@cloudinary-util/url-loader": "^3.0.0",
     "@cloudinary-util/util": "^2.0.0",
     "@tgwf/co2": "^0.12.2",
+    "@vercel/analytics": "^0.1.11",
     "@xata.io/client": "^0.23.3",
     "cloudinary": "^1.35.0",
     "eslint": "8.36.0",

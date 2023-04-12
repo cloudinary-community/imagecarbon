@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 
-import { addNumbers } from '@/lib/util';
 import { collectImageStats, addSite, getCache } from '@/lib/sites';
 import { scrapeImagesFromWebsite } from '@/lib/scraping';
+import { log } from '@/lib/log';
 
 export default function useCollect({ siteUrl }) {
   const [siteImages, setSiteImages] = useState();
@@ -11,9 +11,9 @@ export default function useCollect({ siteUrl }) {
   const [isComplete, setIsComplete] = useState(false);
   const [error, setError] = useState(false);
 
-
   useEffect(() => {
     if ( !siteUrl ) {
+      log('[Collect] no siteUrl, bail.');
       setSiteImages(undefined);
       setDateCollected(undefined);
       setIsLoading(false);
@@ -23,7 +23,7 @@ export default function useCollect({ siteUrl }) {
     }
 
     (async function run() {
-      console.log(`[Collect] Begin scraping ${siteUrl}...`);
+      log(`[Collect] Begin scraping ${siteUrl}...`);
 
       setIsLoading(true);
 
@@ -33,7 +33,7 @@ export default function useCollect({ siteUrl }) {
         const { images: cacheImages, dateCollected: cacheDateCollected } = await getCache({ siteUrl });
 
         if ( cacheImages ) {
-          console.log(`[Collect] Cache found! Restoring ${cacheImages.length} images.`)
+          log(`[Collect] Cache found! Restoring ${cacheImages.length} images.`)
 
           const images = cacheImages.map(image => {
             return {
@@ -60,7 +60,7 @@ export default function useCollect({ siteUrl }) {
           siteUrl
         });
 
-        console.log(`[Collect] Found ${images?.length} images.`)
+        log(`[Collect] Found ${images?.length} images.`)
 
         images = images.map(image => {
           return {
@@ -77,27 +77,28 @@ export default function useCollect({ siteUrl }) {
           siteUrl
         });
 
-        console.log(`[Collect] Collected image data and emissions results.`)
+        log(`[Collect] Collected image data and emissions results.`)
 
         setDateCollected('Just Now');
         setSiteImages(imagesResults);
-        setIsComplete(true);
-
-        setIsLoading(false);
 
         await addSite({
           images: imagesResults,
           siteUrl
         });
 
-        console.log(`[Collect] Added site to cache for next time!`)
+        setIsComplete(true);
+        setIsLoading(false);
+
+        log(`[Collect] Added site to cache for next time!`)
       } catch(e) {
         setError(e.message);
-        console.log(`[Collect] Something went wrong! ${e.message}`);
+        log(`[Collect] Something went wrong! ${e.message}`);
       }
     })();
 
     return () => {
+      log(`[Collect] Cleaning up state.`);
       setSiteImages(undefined);
       setDateCollected(undefined);
       setIsLoading(undefined);
@@ -113,5 +114,4 @@ export default function useCollect({ siteUrl }) {
     dateCollected,
     siteImages,
   }
-
 }
