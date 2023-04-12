@@ -594,21 +594,6 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
           </Container>
         </Section>
 
-        <Section id="check-another-site">
-          <Container>
-            <SectionTitle as="h2">
-              Check another website!
-            </SectionTitle>
-
-            <SectionText size="small">
-              Whether it&apos;s another page or a whole new site, it&apos;s
-              important to have an understanding of where projects stand.
-            </SectionText>
-
-            <FormSubmitWebsite />
-          </Container>
-        </Section>
-
       </div>
 
     </Layout>
