@@ -526,3 +526,148 @@
   }
 
 }
+
+.improvements {
+  
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  li {
+
+    margin-bottom: 1em;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+  }
+
+}
+
+.resources {
+
+  display: grid;
+  grid-gap: 2em;
+  list-style: none;
+  padding: 0 3em;
+  margin: 3em 0;
+
+  @media (min-width: $breakpoint-large) {
+    padding: 0;
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  li {
+    position: relative;
+  }
+
+}
+
+.resourcesTag {
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  position: absolute;
+  top: -1em;
+  right: -1em;
+  width: 4em;
+  height: 4em;
+  font-size: 1.2em;
+  color: white;
+  background-color: black;
+  border-radius: 5em;
+  border: solid 2px lighten(black, 10);
+  box-shadow: 0 2px 10px rgba($color-brand-gray-darker, 1);
+
+  &[data-color="red"] {
+    background-color: $color-red;
+    border: solid 2px lighten($color-red, 10);
+  }
+
+  &[data-color="yellow"] {
+    color: $color-brand-gray-dark;
+    background-color: $color-brand-yellow;
+    border: solid 2px lighten($color-brand-yellow, 10);
+  }
+
+  &[data-color="green"] {
+  background-color: $color-green;
+  border: solid 2px lighten($color-green, 5);
+  }
+
+}
+
+.resourcesTagFormat,
+.resourcesTagSize {
+  display: block;
+  text-align: center;
+  line-height: 1;
+}
+
+.resourcesTagFormat {
+  font-weight: bold;
+}
+
+.resourcesTagSize {
+  font-size: .9em;
+}
+
+.resourcesSource {
+
+  color: $color-text-note;
+  text-align: inherit;
+
+  ul {
+    list-style: none;
+    line-height: 1.5;
+    padding: 0;
+    margin: 0;
+  }
+
+  a {
+
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+  }
+
+}
+
+.cloudinaryContainer {
+
+  text-align: center;
+
+  ul {
+    
+    display: flex;
+    justify-content: center;
+    color: $color-text-note;
+    text-align: center;
+    list-style: none;
+    line-height: 1.5;
+    padding: 0;
+    margin: 0;
+
+    li {
+      margin: 0 .5em;
+    }
+
+    a {
+
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+
+    }
+
+  }
+
+}

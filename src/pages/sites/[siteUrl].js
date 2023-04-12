@@ -51,6 +51,24 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
   const isPercentageOptimized = totalCo2Savings <= ALREADY_OPTIMIZED_PERCENTAGE_THRESHOLD;
   const isSiteAlreadyOptimized = isBytesOptimized || isPercentageOptimized;
 
+  const improvements = [];
+  const accomplishments = [];
+
+  const numberModernFormat = siteImages?.filter(({ original }) => ['webp', 'avif'].includes(original?.format?.toLowerCase())).length;
+  const numberRequiresLazy = siteImages?.filter(({ original }) => original.loading !== 'lazy').length;
+
+  if ( numberRequiresLazy > 0 ) {
+    improvements.push(`Adding loading="lazy" may help with ${numberRequiresLazy} images`)
+  }
+
+  if ( numberModernFormat > 0 ) {
+    accomplishments.push(`You're already serving ${numberModernFormat} images with modern formats`)
+  }
+
+  if ( siteImages?.length > numberModernFormat ) {
+    improvements.push(`${siteImages.length - numberModernFormat} images could be served with modern formats`)
+  }
+
   const requestsYearly = requestsMonthly * 12;
 
   // Construct an array of images that actually make sense to show, with
@@ -433,42 +451,149 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
             )}
           </Container>
         </Section>
-        <Section>
-          <Container>
-            <SectionTitle as="h2">
-              What you&apos;re doing right...
-            </SectionTitle>
+        {accomplishments?.length > 0 && (
+          <Section>
+            <Container>
+              <SectionTitle as="h3">
+                What you&apos;re doing right...
+              </SectionTitle>
 
-            <SectionText size="small">
-              Text
-            </SectionText>
+              <ul className={styles.improvements}>
+                {accomplishments && accomplishments.map(accomplishment => {
+                  return (
+                    <li key={accomplishment}>
+                      <SectionText size="small">
+                        { accomplishment }
+                      </SectionText>
+                    </li>
+                  )
+                })}
+              </ul>
 
-          </Container>
-        </Section>
-        <Section>
-          <Container>
-            <SectionTitle as="h2">
-              What Else You Could be Doing...
-            </SectionTitle>
+            </Container>
+          </Section>
+        )}
+        {improvements?.length > 0 && (
+          <Section>
+            <Container>
+              <SectionTitle as="h3">
+                What Else You Could be Doing...
+              </SectionTitle>
 
-            <SectionText size="small">
-              Text
-            </SectionText>
+              <ul className={styles.improvements}>
+                {improvements && improvements.map(improvement => {
+                  return (
+                    <li key={improvement}>
+                      <SectionText size="small">
+                        { improvement }
+                      </SectionText>
+                    </li>
+                  )
+                })}
+              </ul>
+            </Container>
+          </Section>
+        )}
 
-          </Container>
-        </Section>
         <Section>
           <Container>
             <SectionTitle as="h2">
               More Resources to Learn
             </SectionTitle>
 
-            <SectionText size="small">
-              Text
-            </SectionText>
+            <ul className={styles.resources}>
+              <li>
+                <a href="https://cloudinary.com/state-of-visual-media-report?utm_campaign=devx_imagecarbon&utm_medium=referral">
+                  <CldImage
+                    src="imagecarbon-assets/state-of-visual-media_zrpykz"
+                    width="800"
+                    height="600"
+                    alt="Cloudinary State of Visual Media"
+                  />
+                </a>
+                <SectionText size="tiny">
+                  Going Green with Image and Video Optimization
+                </SectionText>
+              </li>
+              <li>
+                <a href="https://www.thegreenwebfoundation.org/" rel="noopener">
+                  <CldImage
+                    src="imagecarbon-assets/green-web-foundation_guapln"
+                    width="800"
+                    height="600"
+                    alt="The Green Web Foundation"
+                  />
+                </a>
+                <SectionText size="tiny">
+                  Towards a fossil free internet by 2030
+                </SectionText>
+              </li>
+              <li>
+                <a href="https://almanac.httparchive.org/en/2022/sustainability#evaluating-the-environmental-impact-of-websites" rel="noopener">
+                  <CldImage
+                    src="imagecarbon-assets/http-archive-sustainability_ynumgy"
+                    width="800"
+                    height="600"
+                    alt="Rainforest with results as JPEG"
+                  />
+                </a>
+                <SectionText size="tiny">
+                  Environmental impact of websites
+                </SectionText>
+              </li>
+            </ul>
 
           </Container>
         </Section>
+
+        <Section>
+          <Container className={styles.cloudinaryContainer}>
+            <SectionTitle as="h2">
+              Easy Image & Video Optimization
+            </SectionTitle>
+
+            <SectionText size="small">
+              Learn how Cloudinary can help you optimize and
+              deliver all of your digital assets for web
+              and mobile apps!
+            </SectionText>
+
+            <p>
+              <Button href="https://cloudinary.com/users/register_free?utm_campaign=devx_imagecarbon&utm_medium=referral">
+                Get Started Free
+              </Button>
+            </p>
+
+            <ul>
+              <li>
+                <a href="https://cloudinary.com/documentation/image_optimization?utm_campaign=devx_imagecarbon&utm_medium=referral">
+                  Image Optimization
+                </a>
+              </li>
+              <li>
+                <a href="https://cloudinary.com/documentation/video_optimization?utm_campaign=devx_imagecarbon&utm_medium=referral">
+                  Video Optimization
+                </a>
+              </li>
+            </ul>
+          </Container>
+        </Section>
+
+        <Section id="check-another-site">
+          <Container>
+            <SectionTitle as="h2">
+              Check another website!
+            </SectionTitle>
+
+            <SectionText size="small">
+              Whether it&apos;s another page or a whole new site, it&apos;s
+              important to have an understanding of where projects stand.
+            </SectionText>
+
+            <FormSubmitWebsite />
+          </Container>
+        </Section>
+
         <Section id="check-another-site">
           <Container>
             <SectionTitle as="h2">

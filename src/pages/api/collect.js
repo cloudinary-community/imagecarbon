@@ -20,32 +20,36 @@ export default async function handler(req, res) {
 
   console.log(`[Collect] Collecting data for ${siteUrl} with ${images.length} images`);
 
-  const imageUrls = images.map(image => {
+  const imagesToUpload = images.map(image => {
     // Because we're using AVIF as our optimization model, we want to make sure we're comparing
     // the same thing between original and optimized. Because f_auto will serve AVIF whereever
     // possible, we assume and force a format of f_avif otherwise because we're not making
     // a browser request, it may not return the image results in avif format
 
-    if ( isCloudinaryUrl(image) ) {
-      return image.replace('f_auto', 'f_avif');
+    if ( isCloudinaryUrl(image?.url) ) {
+      image.url = image.url.replace('f_auto', 'f_avif')
     }
+
     return image;
   });
 
   try {
-    const imagesQueue = imageUrls.map(image => {
+    const imagesQueue = imagesToUpload.map(({ url, ...image }) => {
       return limit(() => {
         async function upload() {
           try {
-            const results = await cloudinary.uploader.upload(image, {
+            const results = await cloudinary.uploader.upload(url, {
               folder: 'imagecarbon',
               tags: ['imagecarbon', `imagecarbon:site:${siteUrl}`],
               context: {
                 siteUrl,
-                originalUrl: image
+                originalUrl: url
               }
             });
-            return results;
+            return {
+              ...image,
+              upload: results
+            }
           } catch(e) {
             console.log(`[${siteUrl}] Failed to upload image ${image}: ${e.message}`);
             return;
@@ -62,7 +66,7 @@ export default async function handler(req, res) {
     
     // Filter out failed image upload requests
 
-    uploads = uploads.filter(upload => !!upload);
+    uploads = uploads.filter(({ upload }) => !!upload);
 
     console.log(`[Collect] ${uploads.length} successful`);
 
@@ -70,10 +74,10 @@ export default async function handler(req, res) {
       'res.cloudinary.com': await hosting.check('res.cloudinary.com')
     };
 
-    const results = await Promise.all(uploads.map(async (upload) => {
+    const results = await Promise.all(uploads.map(async ({ upload, ...image }) => {
       const { originalUrl } = upload.context.custom;
 
-      const host = cleanUrl(originalUrl).split('/')?.[0];
+      const host = new URL(originalUrl)?.host;
 
       if ( typeof hosts[host] === 'undefined' ) {
         hosts[host] = await hosting.check(host);
@@ -100,7 +104,8 @@ export default async function handler(req, res) {
           format: upload.format,
           size: upload.bytes,
           url: originalUrl,
-          co2: emissions.perVisit(upload.bytes, hosts[host])
+          co2: emissions.perVisit(upload.bytes, hosts[host]),
+          ...image
         },
         uploaded: {
           url: upload.secure_url,
