@@ -1,12 +1,20 @@
 import { parseUrl } from '@cloudinary-util/util';
 import { constructCloudinaryUrl } from '@cloudinary-util/url-loader';
 
+const CLOUDINARY_HOSTS = [
+  'res.cloudinary.com',
+  'cloudinary-marketing-res.cloudinary.com'
+]
+
 /**
  * isCloudinaryUrl
  */
 
 export function isCloudinaryUrl(url) {
-  return url.startsWith('https://res.cloudinary.com');
+  return CLOUDINARY_HOSTS
+    .map(host => url.startsWith(`https://${host}`))
+    .filter(result => !!result)
+    .length > 0;
 }
 
 /**

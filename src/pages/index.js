@@ -28,7 +28,7 @@ export default function Home() {
           </SectionTitle>
           
           <SectionText>
-            Enter your website address and we&apos;ll estimate how much carbon your website is emitting from images.
+            Enter your website address and we&apos;ll calculate how much carbon your website is emitting from images.
           </SectionText>
           
           <FormSubmitWebsite className={styles.homeWebsiteSubmit} />

@@ -64,7 +64,7 @@ export default async function handler(req, res) {
 
     uploads = uploads.filter(upload => !!upload);
 
-    console.log(`[Collect] ${uploads.length} successful uploads.`);
+    console.log(`[Collect] ${uploads.length} successful`);
 
     const hosts = {
       'res.cloudinary.com': await hosting.check('res.cloudinary.com')
