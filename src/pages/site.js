@@ -25,6 +25,14 @@ export default function Site() {
   const { error, siteImages, isLoading, isComplete } = useCollect({ siteUrl });
 
   useEffect(() => {
+    // If we pick up the router and we don't have an active URL, redirect
+    // back to the homepage as it's likely a navigation error
+    if ( router.isReady && !url ) {
+      router.push('/');
+    }
+  }, []);
+
+  useEffect(() => {
     if ( !isComplete || error ) return;
     const redirect = cleanUrl(siteUrl);
     router.push(`/sites/${encodeURIComponent(redirect)}`);

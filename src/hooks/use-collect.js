@@ -7,18 +7,25 @@ import { scrapeImagesFromWebsite } from '@/lib/scraping';
 export default function useCollect({ siteUrl }) {
   const [siteImages, setSiteImages] = useState();
   const [dateCollected, setDateCollected] = useState();
-  // Default the loading state to true as the first action the page will take is the scrape
-  // if not cached
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
-  const [error, setError] = useState();
+  const [error, setError] = useState(false);
 
 
   useEffect(() => {
-    setError(false);
+    if ( !siteUrl ) {
+      setSiteImages(undefined);
+      setDateCollected(undefined);
+      setIsLoading(false);
+      setIsComplete(false);
+      setError(false);
+      return;
+    }
 
     (async function run() {
       console.log(`[Collect] Begin scraping ${siteUrl}...`);
+
+      setIsLoading(true);
 
       try {
           // Default the cache loading state to true so we don't show the site until we know it's cached
@@ -97,7 +104,7 @@ export default function useCollect({ siteUrl }) {
       setIsComplete(undefined);
       setError(undefined);
     }
-  }, []);
+  }, [siteUrl]);
 
   return {
     error,
