@@ -1,4 +1,5 @@
 import { scrapingBeeRequest } from '@/lib/scrapingbee';
+import { log } from '@/lib/log';
 
 /**
  * scrapeImagesFromWebsite
@@ -13,6 +14,7 @@ export async function scrapeImagesFromWebsite({ siteUrl }) {
   }).then(r => r.json());
     
   if ( error ) {
+    log(`[scrapeImagesFromWebsite] ${error}`);
     throw new Error(error);
   }
 

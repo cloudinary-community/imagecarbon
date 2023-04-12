@@ -341,6 +341,9 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                             />
                           )}
                           <p>
+                            Format: { image.original?.format }
+                          </p>
+                          <p>
                             Size: { image.original?.size && Math.ceil(image.original?.size / 1000) }kb
                           </p>
                           <p>
@@ -361,6 +364,9 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                                 loading="lazy"
                               />
                             )}
+                            <p>
+                              Format: { image.optimized?.format }
+                            </p>
                             <p>
                               Size: { image.optimized?.size && Math.ceil(image.optimized?.size / 1000) }kb
                             </p>

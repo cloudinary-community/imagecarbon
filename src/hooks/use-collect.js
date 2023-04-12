@@ -64,9 +64,7 @@ export default function useCollect({ siteUrl }) {
 
         images = images.map(image => {
           return {
-            original: {
-              url: image.url
-            }
+            original: image
           };
         });
 

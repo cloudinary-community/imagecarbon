@@ -9,6 +9,7 @@ const SCRAPING_TIMEOUT = 30 * 1000; // 30 seconds
 
 export default async function handler(res) {
 	const { siteUrl } = await res.json();
+  const cleanSiteUrl = cleanUrl(siteUrl);
 
   try {
     let images;
@@ -17,16 +18,23 @@ export default async function handler(res) {
       const results = await Promise.race([
         findSiteImagesByUrl(siteUrl),
         new Promise((resolve) => {
-          setTimeout(() => resolve(false), SCRAPING_TIMEOUT);
+          setTimeout(() => resolve('SCRAPING_TIMEOUT'), SCRAPING_TIMEOUT);
         })
       ]);
 
       if ( !results ) {
+        console.log(`[${cleanSiteUrl}][Scrape] No results found.`);
+        throw new Error('No results found');
+      } else if ( results === 'SCRAPING_TIMEOUT' ) {
+        console.log(`[${cleanSiteUrl}][Scrape] Timed out.`);
         throw new Error('Scraping timed out');
       }
 
       images = results;
+
+      console.log(`[${cleanSiteUrl}][Scrape] ${images.length} images found.`);
     } catch(e) {
+      console.log(`[${cleanSiteUrl}][Scrape] Error: ${e.message}`, e);
       if ( e.message.includes('If you wish to scrape') ) {
         throw new Error('This website does not allow scraping');
       } else if ( e.message.includes('Scraping timed out') ) {
@@ -39,14 +47,20 @@ export default async function handler(res) {
     images = images && await Promise.all(images.map(async (image) => {
       const { src, loading } = image;
 
-      const host = restoreUrl(cleanUrl(siteUrl, { removeQueryParams: true }));
+      const host = new URL(siteUrl)?.host;
       let url = src;
+
+      // ex: //domain.com...
+
+      if ( url.startsWith('//') ) {
+        url = `https${url}`;
+      }
 
       if ( !url.startsWith('http') ) {
         if ( !url.startsWith('/') ) {
           url = `/${url}`;
         }
-        url = `${host}${url}`;
+        url = `https://${host}${url}`;
       }
 
       return {
@@ -67,7 +81,7 @@ export default async function handler(res) {
       }
     );
   } catch(e) {
-    console.log(`[${cleanUrl(siteUrl)}] Failed to scrape website: ${e.message}`);
+    console.log(`[${cleanSiteUrl}][Scrape] Failed to scrape website: ${e.message}`);
     return new Response(
       JSON.stringify({
         error: e.message
