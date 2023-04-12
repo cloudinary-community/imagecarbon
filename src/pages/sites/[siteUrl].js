@@ -25,6 +25,7 @@ const REQUESTS_MONTHLY_INITIAL = 10000;
 const REQUESTS_MONTHLY_INCREMENT = 10000;
 
 const ALREADY_OPTIMIZED_SIZE_THRESHOLD = 5000;
+const ALREADY_OPTIMIZED_PERCENTAGE_THRESHOLD = 5;
 
 export default function Site({ siteUrl: url, images: siteImages, dateCollected: dateCollectedString }) {
   const siteUrl = restoreUrl(url);
@@ -46,7 +47,9 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
   const [requestsMonthly, setRequestsMonthly] = useState(REQUESTS_MONTHLY_INITIAL);
   const [showAllImages, setShowAllImages] = useState(false);
 
-  const isSiteAlreadyOptimized = dateCollected && totalBytesOriginal <= totalBytesOptimized + ALREADY_OPTIMIZED_SIZE_THRESHOLD;
+  const isBytesOptimized = dateCollected && totalBytesOriginal <= totalBytesOptimized + ALREADY_OPTIMIZED_SIZE_THRESHOLD
+  const isPercentageOptimized = totalCo2Savings <= ALREADY_OPTIMIZED_PERCENTAGE_THRESHOLD;
+  const isSiteAlreadyOptimized = isBytesOptimized || isPercentageOptimized;
 
   const requestsYearly = requestsMonthly * 12;
 
@@ -309,7 +312,7 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
             </SectionText>
 
             <SectionText size="tiny" weight="normal" color="note">
-              Note: Images may appear cropped and optimized for display purposes only. Results are based on original full-sized images.
+              Note: Images may appear cropped and optimized for display purposes only. Results are based on original full-sized images that are embedded in the page.
             </SectionText>
 
             <ul className={styles.breakdownImages}>
