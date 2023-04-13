@@ -12,6 +12,12 @@
   } 
 }
 
+@keyframes spin { 
+  100% { 
+    transform:rotate(360deg); 
+  } 
+}
+
 .siteContainer {
   position: relative;
   z-index: 1;
@@ -118,10 +124,6 @@
       color: $color-text-note;
     }
 
-    p {
-      display: grid;
-    }
-
     a {
       
       display: block;
@@ -136,6 +138,42 @@
 
     }
 
+  }
+
+}
+
+.previewLink {
+  display: grid; // hack for links overflowing
+}
+
+.previewRefresh {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.previewRefreshLink {
+
+  display: inline-flex;
+  align-items: center;
+  color: $color-text-note;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-left: 1em;
+
+  &:disabled {
+    
+    color: darken($color-text-note, 5);
+
+    svg {
+      animation: spin .5s linear infinite;
+    }
+
+  }
+
+  svg {
+    margin-right: .5em;
   }
 
 }

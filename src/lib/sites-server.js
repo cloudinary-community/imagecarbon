@@ -22,6 +22,10 @@ export async function createSite(data) {
   return xata.db.Sites.create(data);
 }
 
+export async function deleteSiteById(id) {
+  return xata.db.Sites.delete(id);
+}
+
 export async function getImagesBySiteUrl(url) {
   const siteUrl = cleanUrl(url);
   return xata.db.Images.filter({ siteUrl }).getAll();
@@ -58,3 +62,26 @@ export async function getCache({ siteUrl: url }) {
     screenshot
   }
 }
+
+
+/**
+ * clearCache
+ */
+
+export async function clearCache({ siteUrl: url }) {
+  const siteUrl = cleanUrl(url);
+
+  const site = await getSiteByUrl(siteUrl);
+
+  const existingImages = await getImagesBySiteUrl(siteUrl);
+
+  const existingImageIds = existingImages.map(({ id }) => id);
+
+  await Promise.all([
+    deleteImagesById(existingImageIds),
+    deleteSiteById(site.id)
+  ]);
+
+  return true;
+}
+

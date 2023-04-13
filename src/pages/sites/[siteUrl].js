@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useRouter } from 'next/router';
 import Head from 'next/head';
-import { CldImage, CldOgImage, getCldImageUrl } from 'next-cloudinary';
-import { FaPizzaSlice, FaCoffee, FaGasPump, FaPlusCircle, FaMinusCircle } from 'react-icons/fa';
+import { CldImage, CldOgImage } from 'next-cloudinary';
+import { FaPizzaSlice, FaCoffee, FaGasPump, FaPlusCircle, FaMinusCircle, FaRedo } from 'react-icons/fa';
 
 import { cleanUrl, restoreUrl, deduplicateArrayByKey, addCommas, addNumbers, trimString, formatGrams, formatBytes } from '@/lib/util';
 import { getCache } from '@/lib/sites-server';
+import { clearCache } from '@/lib/sites';
 import { formatDate } from '@/lib/datetime';
 
 import Layout from '@/components/Layout';
@@ -29,8 +31,15 @@ const ALREADY_OPTIMIZED_SIZE_THRESHOLD = 5000;
 const ALREADY_OPTIMIZED_PERCENTAGE_THRESHOLD = 5;
 
 export default function Site({ siteUrl: url, images: siteImages, dateCollected: dateCollectedString, screenshot }) {
+  const router = useRouter();
   const siteUrl = restoreUrl(url);
   const dateCollected = new Date(dateCollectedString);
+
+  const [requestsMonthly, setRequestsMonthly] = useState(REQUESTS_MONTHLY_INITIAL);
+  const [showAllImages, setShowAllImages] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const lastRefreshed = formatDate(dateCollected);
 
   // Total number of bytes the original images weigh
 
@@ -42,11 +51,6 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
   const totalCo2Original = siteImages ? addNumbers(siteImages?.map(({ original }) => original?.co2)) : undefined;
   const totalCo2Optimized = siteImages ? addNumbers(siteImages?.map(({ optimized }) => optimized?.co2)) : undefined;
   const totalCo2Savings = totalCo2Original && totalCo2Optimized && Math.ceil(100 - (totalCo2Optimized / totalCo2Original * 100));
-
-  const lastRefreshed = formatDate(dateCollected);
-
-  const [requestsMonthly, setRequestsMonthly] = useState(REQUESTS_MONTHLY_INITIAL);
-  const [showAllImages, setShowAllImages] = useState(false);
 
   const isBytesOptimized = dateCollected && totalBytesOriginal <= totalBytesOptimized + ALREADY_OPTIMIZED_SIZE_THRESHOLD
   const isPercentageOptimized = totalCo2Savings <= ALREADY_OPTIMIZED_PERCENTAGE_THRESHOLD;
@@ -126,6 +130,17 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
 
   function handleShowMoreImages() {
     setShowAllImages(true);
+  }
+
+  async function handleOnRefresh(e) {
+    e.preventDefault();
+    setIsRefreshing(true);
+    try {
+      await clearCache({ siteUrl: cleanUrl(siteUrl) });
+      router.push(`/site?url=${cleanUrl(siteUrl)}`);
+    } catch(e) {
+      setIsRefreshing(false);
+    }
   }
 
   return (
@@ -328,8 +343,16 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                   />
                 )}
                 <figcaption>
-                  <p><a href={siteUrl}>{ siteUrl }</a></p>
-                  <p>Last Refreshed: { lastRefreshed }</p>
+                  <p className={styles.previewLink}>
+                    <a href={siteUrl}>{ siteUrl }</a>
+                  </p>
+                  <p className={styles.previewRefresh}>
+                    Last Refreshed: { lastRefreshed }
+                    <button className={styles.previewRefreshLink} onClick={handleOnRefresh} disabled={isRefreshing}>
+                      <FaRedo />
+                      Refresh
+                    </button>
+                  </p>
                 </figcaption>
               </figure>
               <div className={styles.previewStats}>
@@ -667,7 +690,7 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                 </SectionText>
               </li>
               <li>
-                <a href="https://cloudinary.com/state-of-visual-media-report?utm_campaign=devx_imagecarbon&utm_medium=referral">
+                <a href="https://cloudinary.com/state-of-visual-media-report?going-green&utm_source=imagecarbon.com&utm_medium=referral&utm_campaign=devx_imagecarbon&utm_content=stateofvisualmedia">
                   <CldImage
                     src="imagecarbon-assets/state-of-visual-media_zrpykz"
                     width="800"

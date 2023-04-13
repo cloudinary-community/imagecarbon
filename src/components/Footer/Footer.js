@@ -17,7 +17,7 @@ const Footer = ({ ...rest }) => {
           </p>
           <ul className={styles.builtWithLogos}>
             <li>
-              <a href="https://cloudinary.com/?utm_campaign=devx_imagecarbon&utm_medium=referral">
+              <a href="https://cloudinary.com/?utm_source=imagecarbon.com&utm_medium=referral&utm_campaign=devx_imagecarbon&utm_content=footer">
                 <LogoCloudinary />
               </a>
             </li>

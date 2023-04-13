@@ -14,13 +14,6 @@ import styles from '@/styles/Home.module.scss'
 export default function Home() {
   return (
     <Layout>
-      <Head>
-        <title>Image Carbon - Optimize Images, Save the Planet</title>
-        <meta name="description" content="Reduce your carbon footprint with ImageCarbon! Learn how image optimization can lower carbon emissions and make a sustainable web." />
-        <meta name="og:title" content="Optimize Images, Save the Planet with Image Carbon" />
-        <meta name="og:description" content="Reduce your carbon footprint with ImageCarbon! Learn how image optimization can lower carbon emissions and make a sustainable web." />
-      </Head>
-
       <Section className={styles.homeHeroSection}>
         <Container className={styles.homeContainer} size="narrow">
           <SectionTitle>
@@ -28,7 +21,7 @@ export default function Home() {
           </SectionTitle>
           
           <SectionText>
-            Enter your website address and we&apos;ll calculate how much carbon your website is emitting from images.
+            Enter your website address and we&apos;ll calculate how much carbon that page is emitting from images.
           </SectionText>
           
           <FormSubmitWebsite className={styles.homeWebsiteSubmit} />

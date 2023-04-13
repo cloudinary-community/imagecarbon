@@ -41,7 +41,7 @@ export default function Site() {
     if ( !isComplete || error ) return;
     const redirect = cleanUrl(siteUrl);
     log(`[Site] Scraping complete, redirecting to: ${redirect}`);
-    router.push(`/sites/${encodeURIComponent(redirect)}`);
+    router.replace(`/sites/${encodeURIComponent(redirect)}`);
   }, [ isComplete, error, siteUrl])
 
   return (

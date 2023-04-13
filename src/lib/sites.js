@@ -49,3 +49,16 @@ export async function getCache({ siteUrl }) {
     throw new Error(`Failed get cache: ${e.message}`);
   }
 }
+
+/**
+ * clearCache
+ */
+
+export async function clearCache({ siteUrl }) {
+  try {
+    const results = await fetch(`/api/sites/refresh?url=${siteUrl}`).then(r => r.json());
+    return results;
+  } catch(e) {
+    throw new Error(`Failed get cache: ${e.message}`);
+  }
+}

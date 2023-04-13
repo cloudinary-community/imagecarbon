@@ -10,6 +10,10 @@ const Layout = ({ children }) => {
   return (
     <div className={styles.layout}>
       <Head>
+      <title>Image Carbon - Optimize Images, Save the Planet</title>
+        <meta name="description" content="Reduce your carbon footprint with Image Carbon! Learn how image optimization can lower carbon emissions and make a sustainable web." />
+        <meta name="og:title" content="Optimize Images, Save the Planet with Image Carbon" />
+        <meta name="og:description" content="Reduce your carbon footprint with Image Carbon! Learn how image optimization can lower carbon emissions and make a sustainable web." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
