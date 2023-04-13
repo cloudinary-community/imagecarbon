@@ -1,6 +1,5 @@
 import { findSiteImagesByUrl } from '@/lib/scraping';
 import { cleanUrl } from '@/lib/util';
-import { getCldImageUrl } from 'next-cloudinary';
 
 export const config = {
   runtime: 'edge',
