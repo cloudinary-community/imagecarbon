@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import Head from 'next/head';
-import { CldImage } from 'next-cloudinary';
+import { CldImage, CldOgImage, getCldImageUrl } from 'next-cloudinary';
 import { FaPizzaSlice, FaCoffee, FaGasPump, FaPlusCircle, FaMinusCircle } from 'react-icons/fa';
 
-import { cleanUrl, restoreUrl, deduplicateArrayByKey, addCommas, addNumbers } from '@/lib/util';
+import { cleanUrl, restoreUrl, deduplicateArrayByKey, addCommas, addNumbers, trimString, formatGrams, formatBytes } from '@/lib/util';
 import { getCache } from '@/lib/sites-server';
 import { formatDate } from '@/lib/datetime';
 
@@ -17,17 +17,18 @@ import Button from '@/components/Button';
 
 import styles from '@/styles/Site.module.scss'
 
-const carbonGasoline = 8887;
-const carbonCoffee = 209;
-const carbonPizza = 10800 / 8;
+const CARBON_GASOLINE = 8887;
+const CARBON_COFFEE = 209;
+const CARBON_PIZZA = 10800 / 8;
 const REQUESTS_MONTHLY_MIN = 1000;
 const REQUESTS_MONTHLY_INITIAL = 10000;
 const REQUESTS_MONTHLY_INCREMENT = 10000;
+const MIN_IMAGE_SIZE = 5000;
 
 const ALREADY_OPTIMIZED_SIZE_THRESHOLD = 5000;
 const ALREADY_OPTIMIZED_PERCENTAGE_THRESHOLD = 5;
 
-export default function Site({ siteUrl: url, images: siteImages, dateCollected: dateCollectedString }) {
+export default function Site({ siteUrl: url, images: siteImages, dateCollected: dateCollectedString, screenshot }) {
   const siteUrl = restoreUrl(url);
   const dateCollected = new Date(dateCollectedString);
 
@@ -79,7 +80,7 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
   activeImages = activeImages?.filter(({ original }) => {
     if ( !original?.size ) return true;
     // Filter out images smaller than 5kb
-    return original.size > 5000;
+    return original.size > MIN_IMAGE_SIZE;
   }).map(image => {
     // Collect the savings for each image both in size and carbon
     if ( !image.original?.co2 || !image.original?.size ) return image;
@@ -136,16 +137,152 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
         <meta name="og:description" content={`How does ${cleanUrl(siteUrl)} stack up with optimizing for the web?`} />
       </Head>
 
+      {isSiteAlreadyOptimized && (
+        <CldOgImage
+          src="imagecarbon-assets/og-optimized-2400x1200_q2urz1"
+          alt="How much carbon are you producing with your website images? ImageCarbon.com"
+          twitterTitle="Optimize Images, Save the Planet with Image Carbon"
+          overlays={[
+            {
+              url: screenshot?.url,
+              position: {
+                gravity: 'north_west',
+                x: 0,
+                y: 0
+              },
+              effects: [
+                {
+                  crop: 'fill',
+                  gravity: 'north',
+                  width: 1030,
+                  height: 1200
+                }
+              ]
+            },
+            {
+              width: 2400 - 1030 - 120 - 120,
+              crop: 'crop',
+              position: {
+                x: 1030 + 120,
+                y: 125,
+                gravity: 'north_west',
+              },
+              text: {
+                color: 'white',
+                fontFamily: 'Source Sans Pro',
+                fontSize: 80,
+                fontWeight: 'semibold',
+                text: encodeURIComponent(trimString({
+                  string: cleanUrl(siteUrl),
+                  maxLength: 28
+                }))
+              },
+            }
+          ]}
+        />
+      )}
+
+      {!isSiteAlreadyOptimized && (
+        <CldOgImage
+          src="imagecarbon-assets/og-blank-2400x1200_henniw"
+          alt="How much carbon are you producing with your website images? ImageCarbon.com"
+          twitterTitle="Optimize Images, Save the Planet with Image Carbon"
+          overlays={[
+            {
+              url: screenshot?.url,
+              position: {
+                gravity: 'north_west',
+                x: 0,
+                y: 0
+              },
+              effects: [
+                {
+                  crop: 'fill',
+                  gravity: 'north',
+                  width: 1030,
+                  height: 1200
+                }
+              ]
+            },
+            {
+              width: 2400 - 1030 - 120 - 120,
+              crop: 'crop',
+              position: {
+                x: 1030 + 120,
+                y: 125,
+                gravity: 'north_west',
+              },
+              text: {
+                color: 'white',
+                fontFamily: 'Source Sans Pro',
+                fontSize: 80,
+                fontWeight: 'semibold',
+                text: encodeURIComponent(trimString({
+                  string: cleanUrl(siteUrl),
+                  maxLength: 28
+                }))
+              }
+            },
+            {
+              width: 2400 - 1030 - 120 - 120,
+              crop: 'crop',
+              position: {
+                x: 1030 + 120,
+                y: 260,
+                gravity: 'north_west',
+              },
+              text: {
+                color: 'rgb:EECC6E',
+                fontFamily: 'Source Sans Pro',
+                fontSize: 150,
+                fontWeight: 'bold',
+                text: encodeURIComponent(totalCo2Original ? formatGrams(totalCo2Original * REQUESTS_MONTHLY_INITIAL * 12) : '-')
+              }
+            },
+            {
+              width: 2400 - 1030 - 120 - 120,
+              crop: 'crop',
+              position: {
+                x: 1030 + 120,
+                y: 390,
+                gravity: 'north_west',
+              },
+              text: {
+                color: 'white',
+                fontFamily: 'Source Sans Pro',
+                fontSize: 100,
+                fontWeight: 'bold',
+                text: encodeURIComponent('Carbon / year')
+              }
+            },
+            {
+              width: 2400 - 1030 - 120 - 120 - 300,
+              crop: 'fit',
+              position: {
+                x: 1030 + 120,
+                y: 530,
+                gravity: 'north_west',
+              },
+              text: {
+                color: 'white',
+                fontFamily: 'Source Sans Pro',
+                fontSize: 60,
+                fontWeight: 'semibold',
+                lineSpacing: '-10',
+                text: encodeURIComponent('with 1k requests per month from images alone!')
+              }
+            },
+          ]}
+        />
+      )}
+
       <span className="sr-only">
-        {/** Hiddne image used to pre-load the screenshot before the visitor hits the page */}
+        {/** Hidden image used to pre-load the screenshot before the visitor hits the page */}
         {siteUrl && (
           <CldImage
-            src={siteUrl}
-            deliveryType="url2png"
-            width={800}
-            height={600}
-            crop="fill"
-            gravity="north"
+            src={screenshot.url}
+            width={screenshot.width}
+            height={screenshot.height}
             alt={`${siteUrl} Screenshot`}
             priority
           />
@@ -162,7 +299,7 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                   You&apos;re already doing a <strong>great job</strong> optimizing your images!
                 </SectionTitle>
                 <SectionText color="white" weight="semibold" size="small">
-                  But your website still produced <strong>{ totalCo2Original && addCommas(totalCo2Original.toFixed(2)) }g</strong> of carbon from images alone.
+                  But your website still produced <strong>{ formatGrams(totalCo2Original) || '-' }</strong> of carbon from images alone.
                 </SectionText>
               </>
             )}
@@ -183,12 +320,9 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
               <figure className={styles.previewImage}>
                 {siteUrl && (
                   <CldImage
-                    src={siteUrl}
-                    deliveryType="url2png"
-                    width={800}
-                    height={600}
-                    crop="fill"
-                    gravity="north"
+                    src={screenshot.url}
+                    width={screenshot.width}
+                    height={screenshot.height}
                     alt={`${siteUrl} Screenshot`}
                     priority
                   />
@@ -209,8 +343,8 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                   )}
 
                   <ul>
-                    <li>Total Size of Images: <span>{ totalBytesOriginal && Math.ceil(totalBytesOriginal / 1000) }kb</span></li>
-                    <li>Est. CO2: <span>{ totalCo2Original?.toFixed(2) }g</span></li>
+                    <li>Total Size of Images: <span>{ formatBytes(totalBytesOriginal) || '-' }</span></li>
+                    <li>Est. CO2: <span>{ formatGrams(totalCo2Original) || '-' }</span></li>
                   </ul>
                 </div>
                 {!isSiteAlreadyOptimized && (
@@ -218,8 +352,8 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                     <h3>Optimized</h3>
 
                     <ul>
-                      <li>Total Size of Images: <span>{ totalBytesOptimized && Math.ceil(totalBytesOptimized / 1000) }kb</span></li>
-                      <li>Est. CO2: <span>{ totalCo2Optimized?.toFixed(2) }g</span></li>
+                      <li>Total Size of Images: <span>{ formatBytes(totalBytesOptimized) || '-' }</span></li>
+                      <li>Est. CO2: <span>{ formatGrams(totalCo2Optimized) || '-' }</span></li>
                     </ul>
                   </div>
                 )}
@@ -258,11 +392,11 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
             </SectionTitle>
 
             <SectionText color="white" weight="semibold" size="small">
-              Producing <strong>{ addCommas((totalCo2Original * requestsMonthly)?.toFixed(2)) }g</strong> is like the equivalent of...
+              Producing <strong>{ formatGrams(totalCo2Original * requestsYearly, { type: 'kg' } ) || '-' }</strong> is like the equivalent of...
             </SectionText>
 
             <SectionText size="tiny">
-              { addCommas(totalCo2Original?.toFixed(2)) }g x { addCommas(requestsMonthly) } = { addCommas((totalCo2Original * requestsMonthly)?.toFixed(2)) }g
+              { formatGrams(totalCo2Original) || '-' } x { addCommas(requestsYearly) } = { formatGrams(totalCo2Original * requestsYearly) } ({ formatGrams(totalCo2Original * requestsYearly, { type: 'kg' }) })
             </SectionText>
 
             <div className={styles.iconGrid}>
@@ -272,7 +406,7 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                     <FaPizzaSlice />
                   </span>
                   <span className={styles.iconGridTitle}>
-                    <strong>{ (( totalCo2Original * requestsYearly ) / carbonPizza)?.toFixed(1) }</strong> slices of neapolitan pizza
+                    <strong>{ totalCo2Original ? addCommas(( (totalCo2Original * requestsYearly) / CARBON_PIZZA)?.toFixed(1)) : '-' }</strong> slices of neapolitan pizza
                   </span>
                 </li>
                 <li>
@@ -281,7 +415,7 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                     <FaGasPump />
                   </span>
                   <span className={styles.iconGridTitle}>
-                    <strong>{ (( totalCo2Original * requestsYearly ) / carbonGasoline)?.toFixed(1) }</strong> gallons of gas burned
+                    <strong>{ totalCo2Original ? addCommas(( (totalCo2Original * requestsYearly) / CARBON_GASOLINE)?.toFixed(1)) : '-' }</strong> gallons of gas burned
                   </span>
                 </li>
                 <li>
@@ -289,7 +423,7 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                     <FaCoffee />
                   </span>
                   <span className={styles.iconGridTitle}>
-                    <strong>{ (( totalCo2Original * requestsYearly ) / carbonCoffee)?.toFixed(1) }</strong> cups of coffee
+                    <strong>{ totalCo2Original ? addCommas(( (totalCo2Original * requestsYearly) / CARBON_COFFEE)?.toFixed(1)) : '-' }</strong> cups of coffee
                   </span>
                 </li>
               </ul>
@@ -338,8 +472,8 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
 
                 const isImageAlreadyOptimized = image.original?.size <= image.optimized?.size + ALREADY_OPTIMIZED_SIZE_THRESHOLD;
 
-                const estimatedSizeSavings = Math.ceil((image.original?.size - image.optimized?.size) / 1000);
-                const estimatedCarbonSavings = Math.ceil((image.original?.co2 - image.optimized?.co2) / 1000);
+                const estimatedSizeSavings = image.original?.size - image.optimized?.size;
+                const estimatedCarbonSavings = image.original?.co2 - image.optimized?.co2;
 
                 return (
                   <li key={image?.original.url}>
@@ -362,10 +496,10 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                             Format: { image.original?.format }
                           </p>
                           <p>
-                            Size: { image.original?.size && Math.ceil(image.original?.size / 1000) }kb
+                            Size: { formatBytes(image.original?.size) || '-' }
                           </p>
                           <p>
-                            Carbon: { image.original?.co2?.toFixed(2) }g
+                            Carbon: { formatGrams(image.original?.co2, { fixed: 2 }) }
                           </p>
                         </div>
                         {!isSiteAlreadyOptimized && (
@@ -386,10 +520,10 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                               Format: { image.optimized?.format }
                             </p>
                             <p>
-                              Size: { image.optimized?.size && Math.ceil(image.optimized?.size / 1000) }kb
+                              Size: { formatBytes(image.optimized?.size) || '-' }
                             </p>
                             <p>
-                              Carbon: { image.optimized?.co2?.toFixed(2) }g
+                              Carbon: { formatGrams(image.optimized?.co2, { fixed: 2 }) }
                             </p>
                           </div>
                         )}
@@ -399,7 +533,7 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                           <>
                             <h3>Nice work!</h3>
                             <p>
-                              Seems like you are already optimizing your images.
+                              Looks like you are already optimizing this image.
                             </p>
                           </>
                         )}
@@ -408,7 +542,7 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                             <h3>You could save...</h3>
 
                             <p className={styles.breakdownMetaSavings}>
-                              <strong>{ estimatedSizeSavings }kb</strong> = <strong>{ estimatedCarbonSavings }g</strong>
+                              <strong>{ formatBytes(estimatedSizeSavings) || '-' }</strong> = <strong>{ formatGrams(estimatedCarbonSavings) }</strong>
                             </p>
 
                             <p className={styles.breakdownMetaBy}>By...</p>
@@ -446,7 +580,7 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
             )}
             {typeof numberHiddenImages === 'number' && numberHiddenImages > 0 && (
               <SectionText className={styles.breakdownHidden} size="tiny" color="note">
-                <strong>{ numberHiddenImages }</strong> images not shown due to deduplication or smaller than 5kb in size.
+                <strong>{ numberHiddenImages }</strong> images not shown due to deduplication or smaller than { formatBytes(MIN_IMAGE_SIZE) } in size.
               </SectionText>
             )}
           </Container>
@@ -570,7 +704,7 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
 export async function getServerSideProps({ params }) {
   let { siteUrl } = params;
 
-  const { images: cacheImages, dateCollected } = await getCache({ siteUrl });
+  const { images: cacheImages, dateCollected, screenshot } = await getCache({ siteUrl });
 
   if ( !cacheImages ) {
     return {
@@ -596,7 +730,8 @@ export async function getServerSideProps({ params }) {
     props: {
       siteUrl,
       images,
-      dateCollected: dateCollected.toISOString()
+      dateCollected: dateCollected.toISOString(),
+      screenshot: screenshot ? JSON.parse(screenshot) : null
     }
   }
 }

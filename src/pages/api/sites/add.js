@@ -3,7 +3,7 @@ import { getSiteByUrl, updateSiteById, createSite, getImagesBySiteUrl, deleteIma
 
 export default async function handler(req, res) {
   const body = JSON.parse(req.body);
-  const { images } = body;
+  const { images, screenshot } = body;
   const siteUrl = cleanUrl(body.siteUrl);
   
   try {
@@ -41,7 +41,8 @@ export default async function handler(req, res) {
 
     const siteData = {
       siteUrl,
-      dateCollected
+      dateCollected,
+      screenshot: JSON.stringify(screenshot)
     }
 
     if ( site ) {

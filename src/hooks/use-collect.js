@@ -70,7 +70,7 @@ export default function useCollect({ siteUrl }) {
 
         setSiteImages(images);
 
-        const { images: imagesResults } = await collectImageStats({
+        const { images: imagesResults, screenshot } = await collectImageStats({
           images: images.map(({ original }) => original),
           siteUrl
         });
@@ -82,7 +82,8 @@ export default function useCollect({ siteUrl }) {
 
         await addSite({
           images: imagesResults,
-          siteUrl
+          siteUrl,
+          screenshot
         });
 
         setIsComplete(true);

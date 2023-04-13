@@ -1,6 +1,6 @@
 import pLimit from 'p-limit';
 import { co2, hosting } from '@tgwf/co2';
-import { constructCloudinaryUrl } from '@cloudinary-util/url-loader';
+import { getCldImageUrl } from 'next-cloudinary';
 
 import { getCloudinary } from '@/lib/cloudinary-server';
 import { cleanUrl, getFileSize } from '@/lib/util';
@@ -15,10 +15,10 @@ const limit = pLimit(10);
 
 export default async function handler(req, res) {
   const body = JSON.parse(req.body);
-  const { images } = body;
-  const siteUrl = cleanUrl(body.siteUrl);
+  const { images, siteUrl } = body;
+  const cleanSiteUrl = cleanUrl(body.siteUrl);
 
-  console.log(`[Collect] Collecting data for ${siteUrl} with ${images.length} images`);
+  console.log(`[Collect] Collecting data for ${cleanSiteUrl} with ${images.length} images`);
 
   const imagesToUpload = images.map(image => {
     // Because we're using AVIF as our optimization model, we want to make sure we're comparing
@@ -40,7 +40,7 @@ export default async function handler(req, res) {
           try {
             const results = await cloudinary.uploader.upload(url, {
               folder: 'imagecarbon',
-              tags: ['imagecarbon', `imagecarbon:site:${siteUrl}`],
+              tags: ['imagecarbon', `imagecarbon:site:${cleanSiteUrl}`, 'imagecarbon:upload'],
               context: {
                 siteUrl,
                 originalUrl: url
@@ -51,7 +51,7 @@ export default async function handler(req, res) {
               upload: results
             }
           } catch(e) {
-            console.log(`[${siteUrl}] Failed to upload image ${image}: ${e.message}`);
+            console.log(`[${cleanSiteUrl}] Failed to upload image ${url}: ${e.message || e.code || e.error.code}`);
             return;
           }
         };
@@ -66,7 +66,7 @@ export default async function handler(req, res) {
     
     // Filter out failed image upload requests
 
-    uploads = uploads.filter(({ upload }) => !!upload);
+    uploads = uploads.filter(upload => !!upload?.upload);
 
     console.log(`[Collect] ${uploads.length} successful`);
 
@@ -83,16 +83,9 @@ export default async function handler(req, res) {
         hosts[host] = await hosting.check(host);
       }
 
-      const optimizedUrl = constructCloudinaryUrl({
-        options: {
-          src: upload.public_id,
-          format: OPTIMIZED_FORMAT
-        },
-        config: {
-          cloud: {
-            cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
-          }
-        }
+      const optimizedUrl = getCldImageUrl({
+        src: upload.public_id,
+        format: OPTIMIZED_FORMAT
       });
 
       const optimizedSize = await getFileSize(optimizedUrl);
@@ -120,13 +113,37 @@ export default async function handler(req, res) {
       }
     }));
 
+    // Collect the screenshot, download, and upload it to make available to the client
+
+    const screenshotUrl = getCldImageUrl({
+      src: siteUrl,
+      deliveryType: 'url2png',
+      width: 800,
+      height: 600,
+      crop: 'fill',
+      gravity: 'north'
+    });
+
+    const screenshot = await cloudinary.uploader.upload(screenshotUrl, {
+      folder: 'imagecarbon',
+      tags: ['imagecarbon', `imagecarbon:site:${cleanSiteUrl}`, 'imagecarbon:screenshot'],
+      context: {
+        siteUrl
+      }
+    });
+
     res.status(200).json({
       siteUrl,
       date: new Date(Date.now()).toISOString(),
-      images: results
+      images: results,
+      screenshot: {
+        url: screenshot.secure_url,
+        width: screenshot.width,
+        height: screenshot.height,
+      }
     });
   } catch(e) {
-    console.log(`[${siteUrl}] Failed to collect image assets: ${e.message}`);
+    console.log(`[${cleanSiteUrl}] Failed to collect image assets: ${e.message}`);
     res.status(500).json({
       error: e.message
     })

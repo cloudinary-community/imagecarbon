@@ -118,3 +118,65 @@ export function addCommas(number) {
 
   return digits;
 }
+
+/**
+ * trimString
+ */
+
+export function trimString({ string, maxLength, ellipsis = true}) {
+  if ( typeof string !== 'string' || string.length <= maxLength ) return string;
+  const trimmed = string.split('').slice(0, ellipsis ? maxLength - 3 : maxLength).join('');
+  return ellipsis ? `${trimmed}...` : trimmed;
+}
+
+/**
+ * formatGrams
+ */
+
+export function formatGrams(grams, { type = 'g', fixed = 1, commas = true } = {}) {
+  let amount = grams;
+
+  if ( typeof amount !== 'number' ) return amount;
+
+  if ( type === 'kg' ) {
+    amount = amount / 1000;
+  }
+
+  if ( fixed > 0 && amount % 1 !== 0 ) {
+    amount = amount.toFixed(fixed)
+  }
+
+  if ( commas ) {
+    amount = addCommas(amount);
+  }
+
+  return `${amount}${type}`;
+}
+
+/**
+ * formatBytes
+ */
+
+export function formatBytes(grams, { type = 'kb', fixed = 0, commas = true } = {}) {
+  let amount = grams;
+
+  if ( typeof amount !== 'number' ) return amount;
+
+  if ( type === 'kb' ) {
+    amount = amount / 1000;
+  } else if ( type === 'mb' ) {
+    amount = amount / 1000000;
+  }
+
+  if ( fixed > 0 && amount % 1 !== 0 ) {
+    amount = amount.toFixed(fixed)
+  } else if ( fixed === 0 ) {
+    amount = Math.ceil(amount);
+  }
+
+  if ( commas ) {
+    amount = addCommas(amount);
+  }
+
+  return `${amount}${type}`;
+}

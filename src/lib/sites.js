@@ -21,13 +21,14 @@ export async function collectImageStats({ images, siteUrl }) {
  * addSite
  */
 
-export async function addSite({ images, siteUrl }) {
+export async function addSite({ images, siteUrl,screenshot }) {
   try {
     const results = await fetch('/api/sites/add', {
       method: 'POST',
       body: JSON.stringify({
         images,
-        siteUrl
+        siteUrl,
+        screenshot
       })
     }).then(r => r.json());
     return results;

@@ -42,7 +42,7 @@ export async function addImages(images) {
 export async function getCache({ siteUrl: url }) {
   const siteUrl = cleanUrl(url);
 
-  const { dateCollected } = await getSiteByUrl(siteUrl) || {};
+  const { dateCollected , screenshot} = await getSiteByUrl(siteUrl) || {};
 
   const shouldRefresh = dateCollected && new Date(Date.now()) > new Date(dateCollected).getTime() + SCRAPING_CACHE_TIME;
 
@@ -54,6 +54,7 @@ export async function getCache({ siteUrl: url }) {
 
   return {
     dateCollected,
-    images
+    images,
+    screenshot
   }
 }

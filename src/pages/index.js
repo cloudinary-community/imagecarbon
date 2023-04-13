@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import { CldImage, CldOgImage } from 'next-cloudinary'
+import { CldImage } from 'next-cloudinary'
 import { FaLink, FaSearch, FaChartPie, FaImage } from 'react-icons/fa';
 
 import Layout from '@/components/Layout';
