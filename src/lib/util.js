@@ -133,10 +133,14 @@ export function trimString({ string, maxLength, ellipsis = true}) {
  * formatGrams
  */
 
-export function formatGrams(grams, { type = 'g', fixed = 1, commas = true } = {}) {
+export function formatGrams(grams, { type = 'g', limit, fixed = 1, commas = true } = {}) {
   let amount = grams;
 
   if ( typeof amount !== 'number' ) return amount;
+
+  if ( limit && amount >= limit ) {
+    type = 'kg';
+  }
 
   if ( type === 'kg' ) {
     amount = amount / 1000;
@@ -157,15 +161,25 @@ export function formatGrams(grams, { type = 'g', fixed = 1, commas = true } = {}
  * formatBytes
  */
 
-export function formatBytes(grams, { type = 'kb', fixed = 0, commas = true } = {}) {
+export function formatBytes(grams, { type = 'kb', limit, fixed = 0, commas = true } = {}) {
   let amount = grams;
 
   if ( typeof amount !== 'number' ) return amount;
 
-  if ( type === 'kb' ) {
-    amount = amount / 1000;
+  if ( limit && amount >= 1000000 ) {
+    type = 'gb'
+  } else if ( limit && amount >= limit * 1000 ) {
+    type = 'mb';
+  } else if ( limit && amount >= limit ) {
+    type = 'kb';
+  }
+
+  if ( type === 'gb' ) {
+    amount = amount / 1000000000;
   } else if ( type === 'mb' ) {
     amount = amount / 1000000;
+  } else if ( type === 'kb' ) {
+    amount = amount / 1000;
   }
 
   if ( fixed > 0 && amount % 1 !== 0 ) {

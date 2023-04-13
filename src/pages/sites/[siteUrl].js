@@ -472,8 +472,8 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
 
                 const isImageAlreadyOptimized = image.original?.size <= image.optimized?.size + ALREADY_OPTIMIZED_SIZE_THRESHOLD;
 
-                const estimatedSizeSavings = image.original?.size - image.optimized?.size;
-                const estimatedCarbonSavings = image.original?.co2 - image.optimized?.co2;
+                const estimatedSizeSavings = ( image.original?.size - image.optimized?.size ) * requestsYearly;
+                const estimatedCarbonSavings = ( image.original?.co2 - image.optimized?.co2 ) * requestsYearly;
 
                 return (
                   <li key={image?.original.url}>
@@ -542,7 +542,11 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                             <h3>You could save...</h3>
 
                             <p className={styles.breakdownMetaSavings}>
-                              <strong>{ formatBytes(estimatedSizeSavings) || '-' }</strong> = <strong>{ formatGrams(estimatedCarbonSavings) }</strong>
+                              <strong>{ formatBytes(estimatedSizeSavings, { limit: 1500 }) || '-' }</strong> = <strong>{ formatGrams(estimatedCarbonSavings, { fixed: 2, type: 'kg', limit: 1500 }) }</strong>
+                            </p>
+
+                            <p>
+                              with { addCommas(requestsYearly) } yearly requests.
                             </p>
 
                             <p className={styles.breakdownMetaBy}>By...</p>
