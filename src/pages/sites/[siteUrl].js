@@ -30,7 +30,7 @@ const MIN_IMAGE_SIZE = 5000;
 const ALREADY_OPTIMIZED_SIZE_THRESHOLD = 5000;
 const ALREADY_OPTIMIZED_PERCENTAGE_THRESHOLD = 5;
 
-export default function Site({ siteUrl: url, images: siteImages, dateCollected: dateCollectedString, screenshot }) {
+export default function Site({ siteUrl: url, images: siteImages, dateCollected: dateCollectedString, dateCollectedFormatted, screenshot }) {
   const router = useRouter();
   const siteUrl = restoreUrl(url);
   const dateCollected = new Date(dateCollectedString);
@@ -38,8 +38,6 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
   const [requestsMonthly, setRequestsMonthly] = useState(REQUESTS_MONTHLY_INITIAL);
   const [showAllImages, setShowAllImages] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
-
-  const lastRefreshed = formatDate(dateCollected);
 
   // Total number of bytes the original images weigh
 
@@ -347,7 +345,7 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                     <a href={siteUrl}>{ siteUrl }</a>
                   </p>
                   <p className={styles.previewRefresh}>
-                    Last Refreshed: { lastRefreshed }
+                    Last Refreshed: { dateCollectedFormatted }
                     <button className={styles.previewRefreshLink} onClick={handleOnRefresh} disabled={isRefreshing}>
                       <FaRedo />
                       Refresh
@@ -758,6 +756,7 @@ export async function getServerSideProps({ params }) {
       siteUrl,
       images,
       dateCollected: dateCollected.toISOString(),
+      dateCollectedFormatted: formatDate(dateCollected),
       screenshot: screenshot ? JSON.parse(screenshot) : null
     }
   }
