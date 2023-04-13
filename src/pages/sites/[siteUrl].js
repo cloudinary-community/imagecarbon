@@ -432,8 +432,8 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
             <div className={styles.sources}>
               <ul>
                 <li>
-                  <a href="https://onetreeplanted.org/blogs/stories/how-much-co2-does-tree-absorb">
-                    One Tree Planted - How much CO2 does a tree absorb?
+                  <a href="https://www.mdpi.com/2071-1050/14/5/3125">
+                    Carbon Footprint of a Typical Neapolitan Pizzeria
                   </a>
                 </li>
                 <li>
