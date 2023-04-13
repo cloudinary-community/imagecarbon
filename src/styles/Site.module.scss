@@ -638,36 +638,3 @@
   }
 
 }
-
-.cloudinaryContainer {
-
-  text-align: center;
-
-  ul {
-    
-    display: flex;
-    justify-content: center;
-    color: $color-text-note;
-    text-align: center;
-    list-style: none;
-    line-height: 1.5;
-    padding: 0;
-    margin: 0;
-
-    li {
-      margin: 0 .5em;
-    }
-
-    a {
-
-      text-decoration: none;
-
-      &:hover {
-        text-decoration: underline;
-      }
-
-    }
-
-  }
-
-}

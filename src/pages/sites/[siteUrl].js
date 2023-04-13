@@ -503,19 +503,6 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
 
             <ul className={styles.resources}>
               <li>
-                <a href="https://cloudinary.com/state-of-visual-media-report?utm_campaign=devx_imagecarbon&utm_medium=referral">
-                  <CldImage
-                    src="imagecarbon-assets/state-of-visual-media_zrpykz"
-                    width="800"
-                    height="600"
-                    alt="Cloudinary State of Visual Media"
-                  />
-                </a>
-                <SectionText size="tiny">
-                  Going Green with Image and Video Optimization
-                </SectionText>
-              </li>
-              <li>
                 <a href="https://www.thegreenwebfoundation.org/" rel="noopener">
                   <CldImage
                     src="imagecarbon-assets/green-web-foundation_guapln"
@@ -541,41 +528,21 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                   Environmental impact of websites
                 </SectionText>
               </li>
-            </ul>
-
-          </Container>
-        </Section>
-
-        <Section>
-          <Container className={styles.cloudinaryContainer}>
-            <SectionTitle as="h2">
-              Easy Image & Video Optimization
-            </SectionTitle>
-
-            <SectionText size="small">
-              Learn how Cloudinary can help you optimize and
-              deliver all of your digital assets for web
-              and mobile apps!
-            </SectionText>
-
-            <p>
-              <Button href="https://cloudinary.com/users/register_free?utm_campaign=devx_imagecarbon&utm_medium=referral">
-                Get Started Free
-              </Button>
-            </p>
-
-            <ul>
               <li>
-                <a href="https://cloudinary.com/documentation/image_optimization?utm_campaign=devx_imagecarbon&utm_medium=referral">
-                  Image Optimization
+                <a href="https://cloudinary.com/state-of-visual-media-report?utm_campaign=devx_imagecarbon&utm_medium=referral">
+                  <CldImage
+                    src="imagecarbon-assets/state-of-visual-media_zrpykz"
+                    width="800"
+                    height="600"
+                    alt="Cloudinary State of Visual Media"
+                  />
                 </a>
-              </li>
-              <li>
-                <a href="https://cloudinary.com/documentation/video_optimization?utm_campaign=devx_imagecarbon&utm_medium=referral">
-                  Video Optimization
-                </a>
+                <SectionText size="tiny">
+                  Going Green with Image and Video Optimization
+                </SectionText>
               </li>
             </ul>
+
           </Container>
         </Section>
 
