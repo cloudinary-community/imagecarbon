@@ -5,7 +5,7 @@ export const config = {
   runtime: 'edge',
 }
 
-const SCRAPING_TIMEOUT = 30 * 1000; // 30 seconds
+const SCRAPING_TIMEOUT = 45 * 1000; // 30 seconds
 
 export default async function handler(res) {
 	const { siteUrl } = await res.json();
