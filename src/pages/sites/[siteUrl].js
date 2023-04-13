@@ -380,7 +380,7 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                 </button>
               </div>
               <SectionText color="white" weight="semibold" size="small">
-                unique visitors per month...
+                page views per month...
               </SectionText>
               <SectionText size="tiny">
               = { addCommas(requestsMonthly * 12) } requests per year
