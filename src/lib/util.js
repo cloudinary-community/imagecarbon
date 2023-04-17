@@ -159,11 +159,8 @@ export function formatGrams(grams, { type = 'g', limit, fixed = defaultFixed, co
 
   if ( fixed === 'auto' && fixedAmount.split('.')[0] === '0' ) {
     while ( fixedAmount.split('.')[1].split('').filter(num => num !== '0').length === 0 ) {
-      console.log('fixedAmount', fixedAmount)
       placesToFix = placesToFix + 1;
       fixedAmount = amount.toFixed(placesToFix);
-      console.log('placesToFix', placesToFix)
-      console.log('maxAutoFixed', maxAutoFixed)
       if ( placesToFix === maxAutoFixed ) break;
     }
   }

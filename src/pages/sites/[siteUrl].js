@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { CldImage, CldOgImage } from 'next-cloudinary';
-import { FaPizzaSlice, FaCoffee, FaGasPump, FaPlusCircle, FaMinusCircle, FaRedo } from 'react-icons/fa';
+import { FaPizzaSlice, FaCoffee, FaGasPump, FaPlusCircle, FaMinusCircle, FaRedo, FaCheck } from 'react-icons/fa';
 
 import { cleanUrl, restoreUrl, deduplicateArrayByKey, addCommas, addNumbers, trimString, formatGrams, formatBytes } from '@/lib/util';
 import { getCache } from '@/lib/sites-server';
@@ -340,6 +340,13 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                     alt={`${siteUrl} Screenshot`}
                     priority
                   />
+                )}
+                {isSiteAlreadyOptimized && (
+                  <span className={styles.tag} data-color="green">
+                    <span className={styles.tagIcon}>
+                      <FaCheck />
+                    </span>
+                  </span>
                 )}
                 <figcaption>
                   <p className={styles.previewLink}>
