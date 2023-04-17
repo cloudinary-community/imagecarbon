@@ -133,8 +133,13 @@ export function trimString({ string, maxLength, ellipsis = true}) {
  * formatGrams
  */
 
-export function formatGrams(grams, { type = 'g', limit, fixed = 1, commas = true } = {}) {
+const defaultFixed = 1;
+const maxAutoFixed = 4;
+
+export function formatGrams(grams, { type = 'g', limit, fixed = defaultFixed, commas = true } = {}) {
+  let placesToFix = fixed === 'auto' ? defaultFixed : fixed;
   let amount = grams;
+  let fixedAmount;
 
   if ( typeof amount !== 'number' ) return amount;
 
@@ -146,15 +151,29 @@ export function formatGrams(grams, { type = 'g', limit, fixed = 1, commas = true
     amount = amount / 1000;
   }
 
-  if ( fixed > 0 && amount % 1 !== 0 ) {
-    amount = amount.toFixed(fixed)
+  if ( placesToFix > 0 && amount % 1 !== 0 ) {
+    fixedAmount = amount.toFixed(placesToFix)
+  } else {
+    fixedAmount = `${amount}`;
   }
+
+  if ( fixed === 'auto' && fixedAmount.split('.')[0] === '0' ) {
+    while ( fixedAmount.split('.')[1].split('').filter(num => num !== '0').length === 0 ) {
+      console.log('fixedAmount', fixedAmount)
+      placesToFix = placesToFix + 1;
+      fixedAmount = amount.toFixed(placesToFix);
+      console.log('placesToFix', placesToFix)
+      console.log('maxAutoFixed', maxAutoFixed)
+      if ( placesToFix === maxAutoFixed ) break;
+    }
+  }
+  
 
   if ( commas ) {
-    amount = addCommas(amount);
+    fixedAmount = addCommas(fixedAmount);
   }
 
-  return `${amount}${type}`;
+  return `${fixedAmount}${type}`;
 }
 
 /**

@@ -19,7 +19,8 @@ import Button from '@/components/Button';
 
 import styles from '@/styles/Site.module.scss'
 
-const CARBON_GASOLINE = 8887;
+const CARBON_GASOLINE_GALLONS = 8887;
+const CARBON_GASOLINE_LITERS = 33641;
 const CARBON_COFFEE = 209;
 const CARBON_PIZZA = 10800 / 8;
 const REQUESTS_MONTHLY_MIN = 1000;
@@ -312,7 +313,7 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                   You&apos;re already doing a <strong>great job</strong> optimizing your images!
                 </SectionTitle>
                 <SectionText color="white" weight="semibold" size="small">
-                  But your website still produced <strong>{ formatGrams(totalCo2Original) || '-' }</strong> of carbon from images alone.
+                  But your website still produced <strong>{ formatGrams(totalCo2Original, { fixed: 'auto' }) || '-' }</strong> of carbon from images alone.
                 </SectionText>
               </>
             )}
@@ -436,7 +437,10 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                     <FaGasPump />
                   </span>
                   <span className={styles.iconGridTitle}>
-                    <strong>{ totalCo2Original ? addCommas(( (totalCo2Original * requestsYearly) / CARBON_GASOLINE)?.toFixed(1)) : '-' }</strong> gallons of gas burned
+                    <strong>{ totalCo2Original ? addCommas(( (totalCo2Original * requestsYearly) / CARBON_GASOLINE_GALLONS)?.toFixed(1)) : '-' }</strong> gallons of gas burned
+                    <span className={styles.iconGridNote}>
+                      or { totalCo2Original ? addCommas(( (totalCo2Original * requestsYearly) / CARBON_GASOLINE_LITERS)?.toFixed(1)) : '-' } liters
+                    </span>
                   </span>
                 </li>
                 <li>
@@ -513,6 +517,7 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                               loading="lazy"
                             />
                           )}
+                          {isImageAlreadyOptimized}
                           <p>
                             Format: { image.original?.format }
                           </p>
