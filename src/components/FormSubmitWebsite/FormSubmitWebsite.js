@@ -66,7 +66,7 @@ const FormSubmitWebsite = ({ className, ...rest }) => {
   return (
     <Form className={formClassName} onSubmit={handleOnSubmit} {...rest}>
       <FormRow>
-        <FormInput type="text" name="url" placeholder="mywebsite.com" onChange={handleOnInputChange} />
+        <FormInput type='text' name='url' placeholder='mywebsite.com' id='website-input' label='Enter a website address to test' onChange={handleOnInputChange} />
       </FormRow>
       <FormRow>
         <Button disabled={isLoading}>Calculate Emissions</Button>
