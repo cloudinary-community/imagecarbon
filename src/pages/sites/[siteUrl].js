@@ -532,7 +532,7 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                             Size: { formatBytes(image.original?.size) || '-' }
                           </p>
                           <p>
-                            Carbon: { formatGrams(image.original?.co2, { fixed: 2 }) }
+                            Carbon: { formatGrams(image.original?.co2, { fixed: 3 }) }
                           </p>
                         </div>
                         {!isSiteAlreadyOptimized && (
@@ -556,7 +556,7 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                               Size: { formatBytes(image.optimized?.size) || '-' }
                             </p>
                             <p>
-                              Carbon: { formatGrams(image.optimized?.co2, { fixed: 2 }) }
+                              Carbon: { formatGrams(image.optimized?.co2, { fixed: 3 }) }
                             </p>
                           </div>
                         )}
