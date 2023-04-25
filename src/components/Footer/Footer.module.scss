@@ -127,3 +127,57 @@
   color: $color-text-note;
   font-size: .9em;
 }
+
+.cloudinaryContainer {
+  text-align: center;
+}
+
+.cloudinaryLogo {
+  
+  display: inline-block;
+  width: 100%;
+  max-width: 18em;
+
+  a,
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    color: white;
+  }
+
+  path {
+    color: white;
+    fill: white;
+  }
+
+}
+
+.cloudinaryContent {
+  text-align: left;
+}
+
+.cloudinaryTitle {
+  font-size: 1.9em;
+  text-align: inherit;
+  margin-bottom: .4em;
+}
+
+.cloudinaryText {
+  font-size: 1.8em;
+  // color: white;
+  text-align: inherit;
+  padding: 0;
+  margin: 0;
+}
+
+.cloudinaryGetStarted {
+  display: inline-block;
+  text-align: inherit;
+  font-size: 1em;
+  color: $color-primary;
+  font-weight: 700;
+  font-size: 1.6em;
+  text-decoration: none;
+  margin-top: 1em;
+}

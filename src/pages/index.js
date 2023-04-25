@@ -1,4 +1,3 @@
-import Head from 'next/head'
 import { CldImage } from 'next-cloudinary'
 import { FaLink, FaSearch, FaChartPie, FaImage } from 'react-icons/fa';
 
