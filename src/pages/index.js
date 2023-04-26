@@ -147,20 +147,32 @@ export default function Home() {
 
           <ul className={styles.gettingStarted}>
             <li>
-              <span className={styles.gettingStartedIcon}><FaLink /></span>
+              <span className={styles.gettingStartedIcon}>
+                <FaLink aria-hidden='true' />
+              </span>
               <span className={styles.gettingStartedText}>Enter your website address.</span>
             </li>
             <li>
-              <span className={styles.gettingStartedIcon}><FaSearch /></span>
+              <span className={styles.gettingStartedIcon}>
+                <FaSearch aria-hidden='true' />
+              </span>
               <span className={styles.gettingStartedText}>We&apos;ll find the images by rendering the page and parsing the result.</span>
             </li>
             <li>
-              <span className={styles.gettingStartedIcon}><FaChartPie /></span>
+              <span className={styles.gettingStartedIcon}>
+                <FaChartPie aria-hidden='true' />
+              </span>
               <span className={styles.gettingStartedText}>
-                <a href="https://developers.thegreenwebfoundation.org/co2js/overview/" rel="noopener">CO2.js from The Green Web Foundation</a> will tell us how much carbon is being emitted.</span>
+                <a href='https://developers.thegreenwebfoundation.org/co2js/overview/' rel='noopener'>
+                  CO2.js from The Green Web Foundation
+                </a>{' '}
+                will tell us how much carbon is being emitted.
+              </span>
             </li>
             <li>
-              <span className={styles.gettingStartedIcon}><FaImage /></span>
+              <span className={styles.gettingStartedIcon}>
+                <FaImage />
+              </span>
               <span className={styles.gettingStartedText}>We&apos;ll see how much CO2 you can reduce by optimizing your images</span>
             </li>
           </ul>

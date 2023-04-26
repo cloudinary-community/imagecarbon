@@ -16,8 +16,8 @@ const Header = () => {
         </p>
         <ul className={styles.headerLinks}>
           <li>
-            <a href="https://github.com/colbyfayock/imagecarbon" rel="noreferrer">
-              <FaGithub />
+            <a href='https://github.com/colbyfayock/imagecarbon' rel='noreferrer' aria-label='Visit the Image Carbon repo on Github'>
+              <FaGithub aria-hidden='true' />
             </a>
           </li>
         </ul>

@@ -399,13 +399,13 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
               </SectionText>
               <div className={styles.assumingCounter}>
                 <button className={styles.assumingCounterButton} onClick={handleOnRequestsAdd}>
-                  <FaPlusCircle />
+                  <FaPlusCircle aria-label='Increment by 10,000' />
                 </button>
                 <SectionTitle as="span">
                   <strong>{ addCommas(requestsMonthly) }</strong>
                 </SectionTitle>
                 <button className={styles.assumingCounterButton} onClick={handleOnRequestsSubtract} disabled={requestsMonthly === REQUESTS_MONTHLY_MIN}>
-                  <FaMinusCircle />
+                  <FaMinusCircle aria-label='Decrease by 10,000' />
                 </button>
               </div>
               <SectionText color="white" weight="semibold" size="small">
@@ -432,30 +432,29 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
               <ul>
                 <li>
                   <span className={styles.iconGridIcon}>
-                    <FaPizzaSlice />
+                    <FaPizzaSlice aria-hidden='true' />
                   </span>
                   <span className={styles.iconGridTitle}>
-                    <strong>{ totalCo2Original ? addCommas(( (totalCo2Original * requestsYearly) / CARBON_PIZZA)?.toFixed(1)) : '-' }</strong> slices of neapolitan pizza
+                    <strong>{totalCo2Original ? addCommas(((totalCo2Original * requestsYearly) / CARBON_PIZZA)?.toFixed(1)) : '-'}</strong> slices of neapolitan pizza
                   </span>
                 </li>
                 <li>
-
                   <span className={styles.iconGridIcon}>
-                    <FaGasPump />
+                    <FaGasPump aria-hidden='true' />
                   </span>
                   <span className={styles.iconGridTitle}>
-                    <strong>{ totalCo2Original ? addCommas(( (totalCo2Original * requestsYearly) / CARBON_GASOLINE_GALLONS)?.toFixed(1)) : '-' }</strong> gallons of gas burned
+                    <strong>{totalCo2Original ? addCommas(((totalCo2Original * requestsYearly) / CARBON_GASOLINE_GALLONS)?.toFixed(1)) : '-'}</strong> gallons of gas burned
                     <span className={styles.iconGridNote}>
-                      or around { totalCo2Original ? addCommas(( (totalCo2Original * requestsYearly) / CARBON_GASOLINE_LITERS)?.toFixed(1)) : '-' } liters
+                      or around {totalCo2Original ? addCommas(((totalCo2Original * requestsYearly) / CARBON_GASOLINE_LITERS)?.toFixed(1)) : '-'} liters
                     </span>
                   </span>
                 </li>
                 <li>
                   <span className={styles.iconGridIcon}>
-                    <FaCoffee />
+                    <FaCoffee aria-hidden='true' />
                   </span>
                   <span className={styles.iconGridTitle}>
-                    <strong>{ totalCo2Original ? addCommas(( (totalCo2Original * requestsYearly) / CARBON_COFFEE)?.toFixed(1)) : '-' }</strong> cups of coffee
+                    <strong>{totalCo2Original ? addCommas(((totalCo2Original * requestsYearly) / CARBON_COFFEE)?.toFixed(1)) : '-'}</strong> cups of coffee
                   </span>
                 </li>
               </ul>
