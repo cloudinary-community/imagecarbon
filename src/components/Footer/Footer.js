@@ -18,6 +18,7 @@ const Footer = ({ ...rest }) => {
         <Container size="content" className={styles.cloudinaryContainer}>
           <p className={styles.cloudinaryLogo}>
             <a href="https://cloudinary.com/?utm_source=imagecarbon.com&utm_medium=referral&utm_campaign=devx_imagecarbon&utm_content=footer_cloudinary_logo">
+              <span className="sr-only">Cloudinary</span>
               <LogoCloudinary />
             </a>
           </p>
@@ -38,26 +39,31 @@ const Footer = ({ ...rest }) => {
             <ul className={styles.builtWithLogos}>
               <li>
                 <a href="https://cloudinary.com/?utm_source=imagecarbon.com&utm_medium=referral&utm_campaign=devx_imagecarbon&utm_content=footer_builtwith">
+                  <span className="sr-only">Cloudinary</span>
                   <LogoCloudinary />
                 </a>
               </li>
               <li>
                 <a href="https://xata.io/" rel="noopener">
+                  <span className="sr-only">Xata</span>
                   <LogoXata />
                 </a>
               </li>
               <li>
                 <a href="https://www.scrapingbee.com/" rel="noopener">
+                  <span className="sr-only">ScrapingBee</span>
                   <LogoScrapingBee />
                 </a>
               </li>
               <li>
                 <a href="https://nextjs.org/" rel="noopener">
+                  <span className="sr-only">Next.js</span>
                   <LogoNextjs />
                 </a>
               </li>
               <li>
                 <a href="https://vercel.com/ambassador/colby-fayock" rel="noopener">
+                  <span className="sr-only">Vercel</span>
                   <LogoVercel />
                 </a>
               </li>

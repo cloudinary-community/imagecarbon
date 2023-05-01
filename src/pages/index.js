@@ -23,7 +23,7 @@ export default function Home() {
             Enter your website address and we&apos;ll calculate how much carbon that page is emitting from images.
           </SectionText>
           
-          <FormSubmitWebsite className={styles.homeWebsiteSubmit} />
+          <FormSubmitWebsite id="home-hero-website" className={styles.homeWebsiteSubmit} />
         </Container>
       </Section>
 
@@ -191,7 +191,7 @@ export default function Home() {
             Start your journey to a more sustainable future by determining the impact your website images are having on the environment.
           </SectionText>
           
-          <FormSubmitWebsite className={styles.homeWebsiteSubmit} />
+          <FormSubmitWebsite id="home-footer-website" className={styles.homeWebsiteSubmit} />
         </Container>
       </Section>
 
