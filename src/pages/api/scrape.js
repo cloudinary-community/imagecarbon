@@ -53,7 +53,7 @@ export default async function handler(res) {
       // ex: //domain.com...
 
       if ( url.startsWith('//') ) {
-        url = `https${url}`;
+        url = `https:${url}`;
       }
 
       if ( !url.startsWith('http') ) {
