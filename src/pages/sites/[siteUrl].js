@@ -24,8 +24,8 @@ const CARBON_GASOLINE_LITERS = 2347.7;
 const CARBON_COFFEE = 209;
 const CARBON_PIZZA = 10800 / 8;
 const REQUESTS_MONTHLY_MIN = 1000;
-const REQUESTS_MONTHLY_INITIAL = 10000;
-const REQUESTS_MONTHLY_INCREMENT = 10000;
+const REQUESTS_MONTHLY_INITIAL = 100000;
+const REQUESTS_MONTHLY_INCREMENT = 50000;
 const MIN_IMAGE_SIZE = 5000;
 
 const ALREADY_OPTIMIZED_SIZE_THRESHOLD = 5000;
@@ -397,6 +397,7 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
               <SectionText color="white" weight="semibold" size="small">
                 Now assuming you get
               </SectionText>
+
               <div className={styles.assumingCounter}>
                 <button className={styles.assumingCounterButton} onClick={handleOnRequestsAdd}>
                   <FaPlusCircle aria-label='Increment by 10,000' />
@@ -408,6 +409,7 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                   <FaMinusCircle aria-label='Decrease by 10,000' />
                 </button>
               </div>
+
               <SectionText color="white" weight="semibold" size="small">
                 page views per month...
               </SectionText>
