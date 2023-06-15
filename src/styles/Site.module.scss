@@ -228,15 +228,18 @@
 
 .assumingCounter {
 
-  display: flex;
-  justify-content: center;
-  align-items: center;
   margin: .2em auto;
 
   span {
     margin: 0 .2em;
   }
 
+}
+
+.assumingCounterIncrement {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .assumingCounterButton {
@@ -268,6 +271,35 @@
     opacity: .5;
   }
 
+}
+
+.assumingCounterManual {
+  margin: .5em 0;
+}
+
+.assumingCounterManualAction {
+  
+  button {
+    color: $color-primary;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+
+}
+
+.assumingCounterManualEdit {
+
+  input {
+    font-size: .8em;
+    margin-right: .5em;
+  }
+
+}
+
+.assumingCounterManualSave {
+  display: flex;
+  justify-content: center;
 }
 
 .iconGrid {

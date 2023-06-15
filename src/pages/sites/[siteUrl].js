@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { CldImage, CldOgImage } from 'next-cloudinary';
-import { FaPizzaSlice, FaCoffee, FaGasPump, FaPlusCircle, FaMinusCircle, FaRedo, FaCheck } from 'react-icons/fa';
+import { FaPizzaSlice, FaCoffee, FaGasPump, FaPlusCircle, FaMinusCircle, FaRedo, FaCheck, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 
 import { cleanUrl, restoreUrl, deduplicateArrayByKey, addCommas, addNumbers, trimString, formatGrams, formatBytes } from '@/lib/util';
 import { getCache } from '@/lib/sites-server';
@@ -15,6 +15,7 @@ import Container from '@/components/Container';
 import SectionTitle from '@/components/SectionTitle';
 import SectionText from '@/components/SectionText';
 import FormSubmitWebsite from '@/components/FormSubmitWebsite';
+import FormInput from '@/components/FormInput';
 import Button from '@/components/Button';
 
 import styles from '@/styles/Site.module.scss'
@@ -37,6 +38,8 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
   const dateCollected = new Date(dateCollectedString);
 
   const [requestsMonthly, setRequestsMonthly] = useState(REQUESTS_MONTHLY_INITIAL);
+  const [editRequestsManually, setEditRequestsManually] = useState(false);
+
   const [showAllImages, setShowAllImages] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -124,7 +127,21 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
       return;
     }
 
+    if ( requestsMonthly - REQUESTS_MONTHLY_INCREMENT <= 0 ) {
+      setRequestsMonthly(0);
+      return;
+    }
+
     setRequestsMonthly(requestsMonthly - REQUESTS_MONTHLY_INCREMENT);
+  }
+
+  function handleOnManualEdit(e) {
+    e.preventDefault();
+    const fields = Array.from(e.currentTarget.elements);
+    const requestsMonthlyInput = fields.find(field => field.name === 'requests-monthly');
+    setRequestsMonthly(requestsMonthlyInput.value);
+    requestsMonthlyInput.value = undefined;
+    setEditRequestsManually(false);
   }
 
   function handleShowMoreImages() {
@@ -399,15 +416,39 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
               </SectionText>
 
               <div className={styles.assumingCounter}>
-                <button className={styles.assumingCounterButton} onClick={handleOnRequestsAdd}>
-                  <FaPlusCircle aria-label='Increment by 10,000' />
-                </button>
-                <SectionTitle as="span">
-                  <strong>{ addCommas(requestsMonthly) }</strong>
-                </SectionTitle>
-                <button className={styles.assumingCounterButton} onClick={handleOnRequestsSubtract} disabled={requestsMonthly === REQUESTS_MONTHLY_MIN}>
-                  <FaMinusCircle aria-label='Decrease by 10,000' />
-                </button>
+                <div className={styles.assumingCounterIncrement}>
+                  <button className={styles.assumingCounterButton} onClick={handleOnRequestsAdd}>
+                    <FaPlusCircle aria-label='Increment by 10,000' />
+                  </button>
+                  <SectionTitle as="span">
+                    <strong>{ addCommas(requestsMonthly) }</strong>
+                  </SectionTitle>
+                  <button className={styles.assumingCounterButton} onClick={handleOnRequestsSubtract} disabled={requestsMonthly === REQUESTS_MONTHLY_MIN}>
+                    <FaMinusCircle aria-label='Decrease by 10,000' />
+                  </button>
+                </div>
+                <div className={styles.assumingCounterManual}>
+                  {!editRequestsManually && (
+                    <p className={styles.assumingCounterManualAction}>
+                      <button onClick={() => setEditRequestsManually(true)}>Enter Manually</button>
+                    </p>
+                  )}
+                  {editRequestsManually && (
+                    <form onSubmit={handleOnManualEdit}>
+                      <p className={styles.assumingCounterManualEdit}>
+                        <FormInput type="number" name="requests-monthly" />
+                      </p>
+                      <p className={styles.assumingCounterManualSave}>
+                        <button className={styles.assumingCounterButton}>
+                          <FaCheckCircle aria-label='Save' />
+                        </button>
+                        <button className={styles.assumingCounterButton} onClick={() => setEditRequestsManually(false)}>
+                          <FaTimesCircle aria-label='Cancel' />
+                        </button>
+                      </p>
+                    </form>
+                  )}
+                </div>
               </div>
 
               <SectionText color="white" weight="semibold" size="small">
