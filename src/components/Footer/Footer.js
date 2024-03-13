@@ -25,7 +25,7 @@ const Footer = ({ ...rest }) => {
           <SectionText className={styles.cloudinaryText}>
             Easy optimization and delivery for all of your digital assets!
           </SectionText>
-          <a className={styles.cloudinaryGetStarted} href="https://cloudinary.com/developers?utm_source=imagecarbon.com&utm_medium=referral&utm_campaign=devx_imagecarbon&utm_content=footer_cloudinary_learnmore">
+          <a className={styles.cloudinaryGetStarted} href="https://cloudinary.com/?utm_source=imagecarbon.com&utm_medium=referral&utm_campaign=devx_imagecarbon&utm_content=footer_cloudinary_learnmore">
             Learn More
           </a>
         </Container>
