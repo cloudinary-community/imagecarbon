@@ -7,7 +7,9 @@ export async function scrapingBeeRequest({ url, extractRules }) {
     api_key: process.env.SCRAPINGBEE_API_KEY,
     url,
     extract_rules: undefined,
-    wait_browser: 'domcontentloaded'
+    wait_browser: 'domcontentloaded',
+    premium_proxy: 'true',
+    country_code: 'us'
   };
 
   if ( extractRules) {
