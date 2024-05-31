@@ -14,6 +14,8 @@
     "@tgwf/co2": "^0.12.2",
     "@vercel/analytics": "^0.1.11",
     "@xata.io/client": "^0.23.3",
+    "capture-website": "^4.1.0",
+    "chrome-aws-lambda": "^10.1.0",
     "cloudinary": "^1.35.0",
     "eslint": "8.36.0",
     "eslint-config-next": "13.2.4",
