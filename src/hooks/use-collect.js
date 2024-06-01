@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-import { collectImageStats, addSite, getCache } from '@/lib/sites';
+import { collectImageStats, addSite, getCache, getSiteScreenshot } from '@/lib/sites';
 import { scrapeImagesFromWebsite } from '@/lib/scraping';
 import { log } from '@/lib/log';
 
@@ -70,10 +70,21 @@ export default function useCollect({ siteUrl }) {
 
         setSiteImages(images);
 
-        const { images: imagesResults, screenshot } = await collectImageStats({
-          images: images.map(({ original }) => original),
-          siteUrl
-        });
+        const [{ images: imagesResults }, { data }] = await Promise.all([
+          collectImageStats({
+            images: images.map(({ original }) => original),
+            siteUrl
+          }),
+          getSiteScreenshot({
+            siteUrl
+          })
+        ])
+
+        const screenshot = {
+          url: data.secure_url,
+          width: data.width,
+          height: data.height
+        };
 
         log(`[Collect] Collected image data and emissions results.`)
 

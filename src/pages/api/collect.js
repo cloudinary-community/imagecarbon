@@ -61,9 +61,9 @@ export default async function handler(req, res) {
 
 
     let uploads = await Promise.all(imagesQueue);
-    
+
     console.log(`[Collect] Uploads complete.`);
-    
+
     // Filter out failed image upload requests
 
     uploads = uploads.filter(upload => !!upload?.upload);
@@ -113,34 +113,10 @@ export default async function handler(req, res) {
       }
     }));
 
-    // Collect the screenshot, download, and upload it to make available to the client
-
-    const screenshotUrl = getCldImageUrl({
-      src: siteUrl,
-      deliveryType: 'url2png',
-      width: 800,
-      height: 600,
-      crop: 'fill',
-      gravity: 'north'
-    });
-
-    const screenshot = await cloudinary.uploader.upload(screenshotUrl, {
-      folder: 'imagecarbon',
-      tags: ['imagecarbon', `imagecarbon:site:${cleanSiteUrl}`, 'imagecarbon:screenshot'],
-      context: {
-        siteUrl
-      }
-    });
-
     res.status(200).json({
       siteUrl,
       date: new Date(Date.now()).toISOString(),
       images: results,
-      screenshot: {
-        url: screenshot.secure_url,
-        width: screenshot.width,
-        height: screenshot.height,
-      }
     });
   } catch(e) {
     console.log(`[${cleanSiteUrl}] Failed to collect image assets: ${e.message}`);

@@ -18,6 +18,24 @@ export async function collectImageStats({ images, siteUrl }) {
 }
 
 /**
+ * getSiteScreenshot
+ */
+
+export async function getSiteScreenshot({ siteUrl }) {
+  try {
+    const results = await fetch('/api/screenshot', {
+      method: 'POST',
+      body: JSON.stringify({
+        siteUrl
+      })
+    }).then(r => r.json());
+    return results;
+  } catch(e) {
+    throw new Error(`Failed to get screenshot: ${e.message}`);
+  }
+}
+
+/**
  * addSite
  */
 
