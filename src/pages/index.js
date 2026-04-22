@@ -43,6 +43,7 @@ export default function Home() {
 
           <figure className="mx-auto my-0 max-w-[40em]">
             <CldImage
+              className="w-full"
               width="1200"
               height="742"
               src="number-of-bytes-by-percentile-by-type-mobile_fwbgmn"
