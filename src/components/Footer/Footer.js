@@ -15,7 +15,7 @@ const Footer = ({ ...rest }) => {
               <LogoCloudinary />
             </a>
           </p>
-          <p className="m-0 max-w-prose px-0 py-0 text-center text-[1.65rem] font-normal leading-snug text-brand-eggshell md:text-[1.8em]">
+          <p className="m-0 px-0 py-0 text-center text-[1.65rem] font-normal leading-snug text-brand-eggshell md:text-[1.8em]">
             Easy optimization and delivery for all of your digital assets!
           </p>
           <a
