@@ -45,7 +45,8 @@ export default function Home() {
             <CldImage
               width="1200"
               height="742"
-              src="https://res.cloudinary.com/jen-demos/image/upload/v1776825378/number-of-bytes-by-percentile-by-type-mobile_fwbgmn.webp"
+              src="number-of-bytes-by-percentile-by-type-mobile_fwbgmn"
+              format="webp"
               alt="Graph showing that images are by far the highest contributor to number of bytes transferred on the web."
             />
             <figcaption className="mt-[0.8em] text-center text-sm">
