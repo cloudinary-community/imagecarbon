@@ -1,4 +1,3 @@
-import { scrapingBeeRequest } from '@/lib/scrapingbee';
 import { log } from '@/lib/log';
 
 /**
@@ -6,40 +5,28 @@ import { log } from '@/lib/log';
  */
 
 export async function scrapeImagesFromWebsite({ siteUrl }) {
-  const { images, error } = await fetch('/api/scrape', {
+  const res = await fetch('/api/scrape', {
     method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
     body: JSON.stringify({
-      siteUrl
-    })
-  }).then(r => r.json());
-    
-  if ( error ) {
-    log(`[scrapeImagesFromWebsite] ${error}`);
-    throw new Error(error);
-  }
-
-  return { images };
-}
-
-export async function findSiteImagesByUrl(url) {
-  const { error, images } = await scrapingBeeRequest({
-    url,
-    extractRules: {
-      images: {
-        selector: 'img',
-        type: 'list',
-        output: {
-          src: 'img@src',
-          loading: 'img@loading',
-        }
-      }
-    }
+      siteUrl,
+    }),
   });
-  
-  if ( error ) {
-    throw new Error(error);
+
+  const data = await res.json().catch(() => ({}));
+
+  if (!res.ok) {
+    const message = data.error || `Scrape failed (${res.status})`;
+    log(`[scrapeImagesFromWebsite] ${message}`);
+    throw new Error(message);
   }
 
-  return images?.filter(({ src }) => !!src)
-    .filter(({ src }) => !src.includes('data:image/'));
+  if (data.error) {
+    log(`[scrapeImagesFromWebsite] ${data.error}`);
+    throw new Error(data.error);
+  }
+
+  return { images: data.images };
 }

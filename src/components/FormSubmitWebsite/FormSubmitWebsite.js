@@ -2,13 +2,12 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 
 import { cleanUrl, restoreUrl, isValidUrl } from '@/lib/util';
+import { cn } from '@/lib/cn';
 
 import Form from '@/components/Form';
 import FormRow from '@/components/FormRow';
 import FormInput from '@/components/FormInput';
 import Button from '@/components/Button';
-
-import styles from './FormSubmitWebsite.module.scss';
 
 const FormSubmitWebsite = ({ id = 'website-input', className, ...rest }) => {
   const router = useRouter();
@@ -16,45 +15,31 @@ const FormSubmitWebsite = ({ id = 'website-input', className, ...rest }) => {
   const [isLoading, setIsLoading] = useState();
   const [error, setError] = useState();
 
-  let formClassName = styles.formSubmitWebsite;
-
-  if ( className ) {
-    formClassName = `${formClassName} ${className}`;
-  }
-
   function handleOnSubmit(e) {
     e.preventDefault();
 
     const fields = Array.from(e.currentTarget.elements);
-    const values = fields.filter(({ name }) => !!name).map(field => {
+    const values = fields.filter(({ name }) => !!name).map((field) => {
       return {
         name: field.name,
-        value: field.value
-      }
+        value: field.value,
+      };
     });
-    
-    let url = values.find(({ name }) => name === 'url')?.value;
 
-    // First check if it's a valid domain / URL
+    let url = values.find(({ name }) => name === 'url')?.value;
 
     const isValid = isValidUrl(restoreUrl(url));
 
-    if ( !isValid ) {
+    if (!isValid) {
       setError('Please enter a valid URL.');
       return;
     }
 
-    // If it is, continue with submission
-
     setIsLoading(true);
-    
-    if ( url ) {
-      // Make the URLs look a little better by stripping the protocol and trailing slashes
 
+    if (url) {
       url = cleanUrl(url);
-
       url = encodeURIComponent(url);
-
       router.push(`/site?url=${url}`);
     }
   }
@@ -64,7 +49,14 @@ const FormSubmitWebsite = ({ id = 'website-input', className, ...rest }) => {
   }
 
   return (
-    <Form className={formClassName} onSubmit={handleOnSubmit} {...rest}>
+    <Form
+      className={cn(
+        'relative mx-auto max-w-[20em] pb-4 text-base sm:text-xl lg:text-[1.4em] [&_button]:w-full [&_input]:w-full [&_input]:text-center',
+        className
+      )}
+      onSubmit={handleOnSubmit}
+      {...rest}
+    >
       <FormRow>
         <FormInput
           type="text"
@@ -78,10 +70,8 @@ const FormSubmitWebsite = ({ id = 'website-input', className, ...rest }) => {
       <FormRow>
         <Button disabled={isLoading}>Calculate Emissions</Button>
       </FormRow>
-      <FormRow className={styles.formRowError}>
-        {error && (
-          <p>{ error }</p>
-        )}
+      <FormRow className="absolute left-0 right-0 top-full z-10 w-full -mt-2 [&_p]:text-sm">
+        {error && <p>{error}</p>}
       </FormRow>
     </Form>
   );

@@ -28,5 +28,8 @@ yarn-error.log*
 # local env files
 .env*.local
 
-# vercel
+# vercel (optional if you still preview there)
 .vercel
+
+# netlify
+.netlify

@@ -1,12 +1,5 @@
-import styles from './Form.module.scss';
-
 const Form = ({ children, className, ...rest }) => {
-
-  let formClassName = styles.form;
-
-  if ( className ) {
-    formClassName = `${formClassName} ${className}`;
-  }
+  const formClassName = ['w-full', className].filter(Boolean).join(' ');
 
   return (
     <form className={formClassName} {...rest}>

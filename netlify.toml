@@ -1,0 +1,12 @@
+# Next.js on Netlify — requires @netlify/plugin-nextjs (see devDependencies).
+# Docs: https://docs.netlify.com/build/frameworks/framework-setup-guides/nextjs/overview/
+
+[build]
+  command = "npm run build"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Native/heavy deps for Puppeteer + serverless Chromium (used by /api/scrape and /api/screenshot).
+[functions]
+  external_node_modules = ["puppeteer-core", "@sparticuz/chromium-min"]

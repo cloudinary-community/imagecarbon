@@ -1,14 +1,8 @@
-import styles from './FormRow.module.scss';
+import { cn } from '@/lib/cn';
 
 const FormRow = ({ children, className, ...rest }) => {
-  let formRowClassName = styles.formRow;
-
-  if ( className ) {
-    formRowClassName = `${formRowClassName} ${className}`;
-  }
-
   return (
-    <div className={formRowClassName} {...rest}>
+    <div className={cn('mb-2 last:mb-0', className)} {...rest}>
       {children}
     </div>
   );
