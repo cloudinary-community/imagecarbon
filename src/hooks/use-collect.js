@@ -12,37 +12,45 @@ export default function useCollect({ siteUrl }) {
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    if ( !siteUrl ) {
+    let cancelled = false;
+
+    function safeSet(fn) {
+      if (!cancelled) fn();
+    }
+
+    if (!siteUrl) {
       log('[Collect] no siteUrl, bail.');
       setSiteImages(undefined);
       setDateCollected(undefined);
       setIsLoading(false);
       setIsComplete(false);
       setError(false);
-      return;
+      return undefined;
     }
 
     (async function run() {
       log(`[Collect] Begin scraping ${siteUrl}...`);
 
-      setIsLoading(true);
+      safeSet(() => {
+        setIsLoading(true);
+        setError(false);
+        setIsComplete(false);
+      });
 
       try {
-          // Default the cache loading state to true so we don't show the site until we know it's cached
-
         const { images: cacheImages, dateCollected: cacheDateCollected } = await getCache({ siteUrl });
 
-        if ( cacheImages ) {
-          log(`[Collect] Cache found! Restoring ${cacheImages.length} images.`)
+        if (cancelled) return;
 
-          const images = cacheImages.map(image => {
-            return {
-              ...image,
-              optimized: JSON.parse(image.optimized),
-              original: JSON.parse(image.original),
-              uploaded: JSON.parse(image.uploaded)
-            }
-          });
+        if (cacheImages) {
+          log(`[Collect] Cache found! Restoring ${cacheImages.length} images.`);
+
+          const images = cacheImages.map((image) => ({
+            ...image,
+            optimized: JSON.parse(image.optimized),
+            original: JSON.parse(image.original),
+            uploaded: JSON.parse(image.uploaded)
+          }));
 
           setSiteImages(images);
           setDateCollected(cacheDateCollected);
@@ -52,21 +60,13 @@ export default function useCollect({ siteUrl }) {
           return;
         }
 
-        setIsLoading(true);
+        let { images } = await scrapeImagesFromWebsite({ siteUrl });
 
-        // First grab all of the images from the passed in URL
+        if (cancelled) return;
 
-        let { images } = await scrapeImagesFromWebsite({
-          siteUrl
-        });
+        log(`[Collect] Found ${images?.length} images.`);
 
-        log(`[Collect] Found ${images?.length} images.`)
-
-        images = images.map(image => {
-          return {
-            original: image
-          };
-        });
+        images = images.map((image) => ({ original: image }));
 
         setSiteImages(images);
 
@@ -75,7 +75,9 @@ export default function useCollect({ siteUrl }) {
           siteUrl
         });
 
-        log(`[Collect] Collected image data and emissions results.`)
+        if (cancelled) return;
+
+        log('[Collect] Collected image data and emissions results.');
 
         setDateCollected('Just Now');
         setSiteImages(imagesResults);
@@ -86,24 +88,25 @@ export default function useCollect({ siteUrl }) {
           screenshot
         });
 
+        if (cancelled) return;
+
         setIsComplete(true);
         setIsLoading(false);
 
-        log(`[Collect] Added site to cache for next time!`)
-      } catch(e) {
+        log('[Collect] Added site to cache for next time!');
+      } catch (e) {
+        if (cancelled) return;
         setError(e.message);
+        setIsLoading(false);
+        setIsComplete(false);
         log(`[Collect] Something went wrong! ${e.message}`);
       }
     })();
 
     return () => {
-      log(`[Collect] Cleaning up state.`);
-      setSiteImages(undefined);
-      setDateCollected(undefined);
-      setIsLoading(undefined);
-      setIsComplete(undefined);
-      setError(undefined);
-    }
+      cancelled = true;
+      log('[Collect] Effect cancelled (navigation or Strict Mode remount).');
+    };
   }, [siteUrl]);
 
   return {
@@ -111,6 +114,6 @@ export default function useCollect({ siteUrl }) {
     isLoading,
     isComplete,
     dateCollected,
-    siteImages,
-  }
+    siteImages
+  };
 }

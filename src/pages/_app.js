@@ -2,17 +2,10 @@ import { useEffect } from 'react';
 import Head from 'next/head';
 import Script from 'next/script';
 import { useRouter } from 'next/router';
-import { Source_Sans_Pro } from 'next/font/google';
-import { Analytics } from '@vercel/analytics/react';
 import * as gtag from '@/lib/gtag';
+import { sourceSans } from '@/lib/fonts';
 
-import '@/styles/globals.scss';
-
-const sourceSansPro = Source_Sans_Pro({
-  weight: ['400', '600', '700', '900'],
-  style: ['normal'],
-  subsets: ['latin'],
-});
+import '@/styles/globals.css';
 
 export default function App({ Component, pageProps }) {
   const router = useRouter();
@@ -29,7 +22,7 @@ export default function App({ Component, pageProps }) {
     <>
       <style jsx global>{`
         html {
-          font-family: ${sourceSansPro.style.fontFamily};
+          font-family: ${sourceSans.style.fontFamily};
         }
       `}</style>
       <Head>
@@ -55,7 +48,6 @@ export default function App({ Component, pageProps }) {
         />
       )}
       <Component {...pageProps} />
-      <Analytics />
     </>
   );
 }

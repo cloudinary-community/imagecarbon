@@ -1,14 +1,42 @@
-import { findSiteImagesByUrl } from '@/lib/scraping';
+import { findSiteImagesByUrl } from '@/lib/scraping-server';
 import { cleanUrl } from '@/lib/util';
 
 export const config = {
-  runtime: 'edge',
+  api: {
+    bodyParser: {
+      sizeLimit: '256kb',
+    },
+  },
+};
+
+const SCRAPING_TIMEOUT = 45 * 1000;
+
+function parseBody(req) {
+  const body = req.body;
+  if (body && typeof body === 'object' && !Buffer.isBuffer(body)) {
+    return body;
+  }
+  if (typeof body === 'string') {
+    try {
+      return JSON.parse(body);
+    } catch {
+      return null;
+    }
+  }
+  return null;
 }
 
-const SCRAPING_TIMEOUT = 45 * 1000; // 30 seconds
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
 
-export default async function handler(res) {
-	const { siteUrl } = await res.json();
+  const parsed = parseBody(req);
+  const siteUrl = parsed?.siteUrl;
+  if (!siteUrl || typeof siteUrl !== 'string') {
+    return res.status(400).json({ error: 'Missing siteUrl' });
+  }
+
   const cleanSiteUrl = cleanUrl(siteUrl);
 
   try {
@@ -19,79 +47,57 @@ export default async function handler(res) {
         findSiteImagesByUrl(siteUrl),
         new Promise((resolve) => {
           setTimeout(() => resolve('SCRAPING_TIMEOUT'), SCRAPING_TIMEOUT);
-        })
+        }),
       ]);
 
-      if ( !results ) {
+      if (!results) {
         console.log(`[${cleanSiteUrl}][Scrape] No results found.`);
         throw new Error('No results found');
-      } else if ( results === 'SCRAPING_TIMEOUT' ) {
+      }
+      if (results === 'SCRAPING_TIMEOUT') {
         console.log(`[${cleanSiteUrl}][Scrape] Timed out.`);
         throw new Error('Scraping timed out');
       }
 
       images = results;
-
       console.log(`[${cleanSiteUrl}][Scrape] ${images.length} images found.`);
-    } catch(e) {
+    } catch (e) {
       console.log(`[${cleanSiteUrl}][Scrape] Error: ${e.message}`, e);
-      if ( e.message.includes('If you wish to scrape') ) {
-        throw new Error('This website does not allow scraping');
-      } else if ( e.message.includes('Scraping timed out') ) {
+      if (e.message.includes('Scraping timed out')) {
         throw new Error('We had trouble connecting to this website.');
-      } else {
-        throw e;
       }
+      throw e;
     }
 
-    images = images && await Promise.all(images.map(async (image) => {
-      const { src, loading } = image;
+    const host = new URL(siteUrl).host;
+    images = await Promise.all(
+      images.map(async (image) => {
+        const { src, loading } = image;
+        let imgUrl = src;
 
-      const host = new URL(siteUrl)?.host;
-      let url = src;
-
-      // ex: //domain.com...
-
-      if ( url.startsWith('//') ) {
-        url = `https:${url}`;
-      }
-
-      if ( !url.startsWith('http') ) {
-        if ( !url.startsWith('/') ) {
-          url = `/${url}`;
+        if (imgUrl.startsWith('//')) {
+          imgUrl = `https:${imgUrl}`;
         }
-        url = `https://${host}${url}`;
-      }
 
-      return {
-        url,
-        loading
-      }
-    }));
+        if (!imgUrl.startsWith('http')) {
+          if (!imgUrl.startsWith('/')) {
+            imgUrl = `/${imgUrl}`;
+          }
+          imgUrl = `https://${host}${imgUrl}`;
+        }
 
-    return new Response(
-      JSON.stringify({
-        images
-      }),
-      {
-        status: 200,
-        headers: {
-          'content-type': 'application/json',
-        },
-      }
+        return {
+          url: imgUrl,
+          loading,
+        };
+      })
     );
-  } catch(e) {
+
+    return res.status(200).json({ images });
+  } catch (e) {
     console.log(`[${cleanSiteUrl}][Scrape] Failed to scrape website: ${e.message}`);
-    return new Response(
-      JSON.stringify({
-        error: e.message
-      }),
-      {
-        status: 500,
-        headers: {
-          'content-type': 'application/json',
-        },
-      }
-    );
+    return res.status(500).json({
+      error: e.message,
+    });
   }
 }

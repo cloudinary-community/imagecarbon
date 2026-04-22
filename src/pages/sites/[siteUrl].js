@@ -8,6 +8,7 @@ import { cleanUrl, restoreUrl, deduplicateArrayByKey, addCommas, addNumbers, tri
 import { getCache } from '@/lib/sites-server';
 import { clearCache } from '@/lib/sites';
 import { formatDate } from '@/lib/datetime';
+import { sourceSans } from '@/lib/fonts';
 
 import Layout from '@/components/Layout';
 import Section from '@/components/Section';
@@ -17,8 +18,8 @@ import SectionText from '@/components/SectionText';
 import FormSubmitWebsite from '@/components/FormSubmitWebsite';
 import FormInput from '@/components/FormInput';
 import Button from '@/components/Button';
-
-import styles from '@/styles/Site.module.scss'
+import { cn } from '@/lib/cn';
+import { HERO_GLOW, HERO_INNER } from '@/lib/heroClasses';
 
 const CARBON_GASOLINE_GALLONS = 8887;
 const CARBON_GASOLINE_LITERS = 2347.7;
@@ -31,6 +32,30 @@ const MIN_IMAGE_SIZE = 5000;
 
 const ALREADY_OPTIMIZED_SIZE_THRESHOLD = 5000;
 const ALREADY_OPTIMIZED_PERCENTAGE_THRESHOLD = 5;
+
+const optimizedBreakdownImage = cn(
+  'group-data-[is-site-optimized=true]/site:mx-auto group-data-[is-site-optimized=true]/site:max-w-[40em]'
+);
+
+const optimizedBreakdownVersions = 'group-data-[is-site-optimized=true]/site:grid-cols-1';
+
+const breakdownVersionCard =
+  'text-left [&_img]:block [&_img]:bg-brand-eggshell [&_p]:m-0 [&_p]:text-[1.3em] [&_p]:font-semibold [&_p:first-of-type]:mt-2';
+
+const breakdownUrlsList = cn(
+  'mt-12 list-none space-y-2 p-0 text-left text-[0.9em] text-ui-note',
+  'group-data-[is-site-optimized=true]/site:text-center',
+  '[&_a]:text-ui-note [&_a]:no-underline hover:[&_a]:underline'
+);
+
+const previewGrid =
+  'mx-auto mt-8 grid max-w-[54em] grid-cols-1 gap-12 md:mt-16 md:grid-cols-[6fr_4fr] md:text-left';
+
+const previewFigure =
+  'relative mx-auto max-w-[30em] [&_img]:block [&_img]:bg-brand-eggshell [&_figcaption]:mt-[0.8em] [&_figcaption]:text-center [&_figcaption]:text-sm [&_figcaption_p]:text-ui-note [&_figcaption_a]:block [&_figcaption_a]:overflow-hidden [&_figcaption_a]:text-ellipsis [&_figcaption_a]:whitespace-nowrap [&_figcaption_a]:text-ui-note [&_figcaption_a]:no-underline hover:[&_figcaption_a]:underline';
+
+const tagGreenBadge =
+  'absolute -right-4 -top-4 flex h-16 w-16 flex-col items-center justify-center rounded-full border-2 border-[rgb(44,162,1)] bg-ui-green text-[2em] text-white';
 
 export default function Site({ siteUrl: url, images: siteImages, dateCollected: dateCollectedString, dateCollectedFormatted, screenshot }) {
   const router = useRouter();
@@ -200,7 +225,7 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
               },
               text: {
                 color: 'white',
-                fontFamily: 'Source Sans Pro',
+                fontFamily: sourceSans.style.fontFamily,
                 fontSize: 80,
                 fontWeight: 'semibold',
                 text: encodeURIComponent(trimString({
@@ -245,7 +270,7 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
               },
               text: {
                 color: 'white',
-                fontFamily: 'Source Sans Pro',
+                fontFamily: sourceSans.style.fontFamily,
                 fontSize: 80,
                 fontWeight: 'semibold',
                 text: encodeURIComponent(trimString({
@@ -264,7 +289,7 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
               },
               text: {
                 color: 'rgb:EECC6E',
-                fontFamily: 'Source Sans Pro',
+                fontFamily: sourceSans.style.fontFamily,
                 fontSize: 150,
                 fontWeight: 'bold',
                 text: encodeURIComponent(totalCo2Original ? formatGrams(totalCo2Original * REQUESTS_MONTHLY_INITIAL * 12) : '-')
@@ -280,7 +305,7 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
               },
               text: {
                 color: 'white',
-                fontFamily: 'Source Sans Pro',
+                fontFamily: sourceSans.style.fontFamily,
                 fontSize: 100,
                 fontWeight: 'bold',
                 text: encodeURIComponent('Carbon / year')
@@ -296,7 +321,7 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
               },
               text: {
                 color: 'white',
-                fontFamily: 'Source Sans Pro',
+                fontFamily: sourceSans.style.fontFamily,
                 fontSize: 60,
                 fontWeight: 'semibold',
                 lineSpacing: '-10',
@@ -320,9 +345,12 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
         )}
       </span>
 
-      <div data-is-site-optimized={isSiteAlreadyOptimized}>
-        <Section className={styles.siteHeroSection}>
-          <Container className={`${styles.siteContainer} ${styles.siteHeroContainer}`} size="narrow">
+      <div
+        className="group/site"
+        data-is-site-optimized={isSiteAlreadyOptimized ? 'true' : 'false'}
+      >
+        <Section className={HERO_GLOW}>
+          <Container className={cn(HERO_INNER, 'p-8')} size="narrow">
 
             {isSiteAlreadyOptimized && (
               <>
@@ -347,8 +375,8 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
               Estimated using the <a href="https://sustainablewebdesign.org/calculating-digital-emissions/">Sustainable Web Design</a> model.
             </SectionText>
 
-            <div className={styles.preview}>
-              <figure className={styles.previewImage}>
+            <div className={previewGrid}>
+              <figure className={previewFigure}>
                 {siteUrl && (
                   <CldImage
                     src={screenshot.url}
@@ -359,26 +387,30 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                   />
                 )}
                 {isSiteAlreadyOptimized && (
-                  <span className={styles.tag} data-color="green">
-                    <span className={styles.tagIcon}>
+                  <span className={tagGreenBadge} data-color="green">
+                    <span className="flex items-center justify-center">
                       <FaCheck />
                     </span>
                   </span>
                 )}
                 <figcaption>
-                  <p className={styles.previewLink}>
+                  <p className="grid">
                     <a href={siteUrl}>{ siteUrl }</a>
                   </p>
-                  <p className={styles.previewRefresh}>
+                  <p className="flex items-center justify-center">
                     Last Refreshed: { dateCollectedFormatted }
-                    <button className={styles.previewRefreshLink} onClick={handleOnRefresh} disabled={isRefreshing}>
-                      <FaRedo />
+                    <button
+                      className="ml-4 inline-flex cursor-pointer items-center border-0 bg-transparent text-ui-note hover:underline disabled:cursor-default disabled:text-ui-note/80 disabled:[&_svg]:animate-spin-icon"
+                      onClick={handleOnRefresh}
+                      disabled={isRefreshing}
+                    >
+                      <FaRedo className="mr-2" />
                       Refresh
                     </button>
                   </p>
                 </figcaption>
               </figure>
-              <div className={styles.previewStats}>
+              <div className="[&>div]:mb-8 [&>div:last-child]:mb-0 [&_h3]:mb-[0.4em] [&_h3]:text-3xl [&_ul]:m-0 [&_ul]:list-none [&_ul]:p-0 [&_ul]:text-[1.3em] [&_ul]:leading-[1.8] [&_li_span]:ml-2 [&_li_span]:text-brand-yellow">
                 <div>
                   {!isSiteAlreadyOptimized && (
                     <h3>Original</h3>
@@ -409,40 +441,55 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
         </Section>
 
         <Section>
-          <Container className={`${styles.siteContainer}`} size="narrow">
-            <div className={styles.assuming}>
-              <SectionText color="white" weight="semibold" size="small">
+          <Container className={HERO_INNER} size="narrow">
+            <div className="mb-16">
+              <SectionText className="!m-0" color="white" weight="semibold" size="small">
                 Now assuming you get
               </SectionText>
 
-              <div className={styles.assumingCounter}>
-                <div className={styles.assumingCounterIncrement}>
-                  <button className={styles.assumingCounterButton} onClick={handleOnRequestsAdd}>
+              <div className="mx-auto my-[0.2em]">
+                <div className="flex items-center justify-center">
+                  <button
+                    className="flex items-center justify-center border-0 bg-transparent text-2xl text-brand-eggshell transition-transform hover:scale-110 hover:text-white active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
+                    onClick={handleOnRequestsAdd}
+                  >
                     <FaPlusCircle aria-label='Increment by 10,000' />
                   </button>
-                  <SectionTitle as="span">
+                  <SectionTitle as="span" className="mx-2 my-0">
                     <strong>{ addCommas(requestsMonthly) }</strong>
                   </SectionTitle>
-                  <button className={styles.assumingCounterButton} onClick={handleOnRequestsSubtract} disabled={requestsMonthly === REQUESTS_MONTHLY_MIN}>
+                  <button
+                    className="flex items-center justify-center border-0 bg-transparent text-2xl text-brand-eggshell transition-transform hover:scale-110 hover:text-white active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
+                    onClick={handleOnRequestsSubtract}
+                    disabled={requestsMonthly === REQUESTS_MONTHLY_MIN}
+                  >
                     <FaMinusCircle aria-label='Decrease by 10,000' />
                   </button>
                 </div>
-                <div className={styles.assumingCounterManual}>
+                <div className="my-2">
                   {!editRequestsManually && (
-                    <p className={styles.assumingCounterManualAction}>
-                      <button onClick={() => setEditRequestsManually(true)}>Enter Manually</button>
+                    <p className="text-center">
+                      <button
+                        className="cursor-pointer border-0 bg-transparent font-[inherit] text-brand-yellow"
+                        onClick={() => setEditRequestsManually(true)}
+                      >
+                        Enter Manually
+                      </button>
                     </p>
                   )}
                   {editRequestsManually && (
                     <form onSubmit={handleOnManualEdit}>
-                      <p className={styles.assumingCounterManualEdit}>
+                      <p className="text-center">
                         <FormInput type="number" name="requests-monthly" />
                       </p>
-                      <p className={styles.assumingCounterManualSave}>
-                        <button className={styles.assumingCounterButton}>
+                      <p className="flex justify-center gap-2">
+                        <button className="flex items-center justify-center border-0 bg-transparent text-2xl text-brand-eggshell">
                           <FaCheckCircle aria-label='Save' />
                         </button>
-                        <button className={styles.assumingCounterButton} onClick={() => setEditRequestsManually(false)}>
+                        <button
+                          className="flex items-center justify-center border-0 bg-transparent text-2xl text-brand-eggshell"
+                          onClick={() => setEditRequestsManually(false)}
+                        >
                           <FaTimesCircle aria-label='Cancel' />
                         </button>
                       </p>
@@ -451,10 +498,10 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                 </div>
               </div>
 
-              <SectionText color="white" weight="semibold" size="small">
+              <SectionText className="!m-0" color="white" weight="semibold" size="small">
                 page views per month...
               </SectionText>
-              <SectionText size="tiny">
+              <SectionText className="!m-0" size="tiny">
               = { addCommas(requestsMonthly * 12) } requests per year
               </SectionText>
             </div>
@@ -471,52 +518,67 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
               { formatGrams(totalCo2Original) || '-' } x { addCommas(requestsYearly) } = { formatGrams(totalCo2Original * requestsYearly) } ({ formatGrams(totalCo2Original * requestsYearly, { type: 'kg' }) })
             </SectionText>
 
-            <div className={styles.iconGrid}>
-              <ul>
-                <li>
-                  <span className={styles.iconGridIcon}>
+            <div className="my-16 flex w-full justify-center text-inherit">
+              <ul className="mx-auto grid list-none grid-cols-1 gap-4 p-0 text-base md:grid-cols-3 md:gap-8 lg:text-xl">
+                <li className="mb-8 flex flex-row items-center justify-start p-0 md:mb-0 md:flex-col md:items-center">
+                  <span className="mb-0 mr-[0.8em] flex h-10 w-10 shrink-0 grow-0 items-center justify-center rounded-full bg-brand-yellow text-4xl text-brand-gray-dark sm:text-5xl md:mb-2 md:mr-0 md:h-auto md:w-auto md:p-2 md:text-6xl">
                     <FaPizzaSlice aria-hidden='true' />
                   </span>
-                  <span className={styles.iconGridTitle}>
-                    <strong>{totalCo2Original ? addCommas(((totalCo2Original * requestsYearly) / CARBON_PIZZA)?.toFixed(1)) : '-'}</strong> slices of neapolitan pizza
+                  <span className="block text-left text-base md:text-center md:text-lg lg:text-2xl">
+                    <strong className="mb-2 block text-[1.5em] leading-[0.8] text-brand-yellow md:mb-2 lg:mb-2">
+                      {totalCo2Original ? addCommas(((totalCo2Original * requestsYearly) / CARBON_PIZZA)?.toFixed(1)) : '-'}
+                    </strong>{' '}
+                    slices of neapolitan pizza
                   </span>
                 </li>
-                <li>
-                  <span className={styles.iconGridIcon}>
+                <li className="mb-8 flex flex-row items-center justify-start p-0 md:mb-0 md:flex-col md:items-center">
+                  <span className="mb-0 mr-[0.8em] flex h-10 w-10 shrink-0 grow-0 items-center justify-center rounded-full bg-brand-yellow text-4xl text-brand-gray-dark sm:text-5xl md:mb-2 md:mr-0 md:h-auto md:w-auto md:p-2 md:text-6xl">
                     <FaGasPump aria-hidden='true' />
                   </span>
-                  <span className={styles.iconGridTitle}>
-                    <strong>{totalCo2Original ? addCommas(((totalCo2Original * requestsYearly) / CARBON_GASOLINE_GALLONS)?.toFixed(1)) : '-'}</strong> gallons of gas burned
-                    <span className={styles.iconGridNote}>
+                  <span className="block text-left text-base md:text-center md:text-lg lg:text-2xl">
+                    <strong className="mb-2 block text-[1.5em] leading-[0.8] text-brand-yellow md:mb-2 lg:mb-2">
+                      {totalCo2Original ? addCommas(((totalCo2Original * requestsYearly) / CARBON_GASOLINE_GALLONS)?.toFixed(1)) : '-'}
+                    </strong>{' '}
+                    gallons of gas burned
+                    <span className="mt-1 block text-sm md:mb-2 md:text-xs lg:text-xs">
                       or around {totalCo2Original ? addCommas(((totalCo2Original * requestsYearly) / CARBON_GASOLINE_LITERS)?.toFixed(1)) : '-'} liters
                     </span>
                   </span>
                 </li>
-                <li>
-                  <span className={styles.iconGridIcon}>
+                <li className="mb-8 flex flex-row items-center justify-start p-0 md:mb-0 md:flex-col md:items-center">
+                  <span className="mb-0 mr-[0.8em] flex h-10 w-10 shrink-0 grow-0 items-center justify-center rounded-full bg-brand-yellow text-4xl text-brand-gray-dark sm:text-5xl md:mb-2 md:mr-0 md:h-auto md:w-auto md:p-2 md:text-6xl">
                     <FaCoffee aria-hidden='true' />
                   </span>
-                  <span className={styles.iconGridTitle}>
-                    <strong>{totalCo2Original ? addCommas(((totalCo2Original * requestsYearly) / CARBON_COFFEE)?.toFixed(1)) : '-'}</strong> cups of coffee
+                  <span className="block text-left text-base md:text-center md:text-lg lg:text-2xl">
+                    <strong className="mb-2 block text-[1.5em] leading-[0.8] text-brand-yellow md:mb-2 lg:mb-2">
+                      {totalCo2Original ? addCommas(((totalCo2Original * requestsYearly) / CARBON_COFFEE)?.toFixed(1)) : '-'}
+                    </strong>{' '}
+                    cups of coffee
                   </span>
                 </li>
               </ul>
             </div>
 
-            <div className={styles.sources}>
-              <ul>
+            <div className="text-inherit text-ui-note">
+              <ul className="m-0 list-none p-0 leading-normal">
                 <li>
-                  <a href="https://www.mdpi.com/2071-1050/14/5/3125">
+                  <a className="text-ui-note no-underline hover:underline" href="https://www.mdpi.com/2071-1050/14/5/3125">
                     Carbon Footprint of a Typical Neapolitan Pizzeria
                   </a>
                 </li>
                 <li>
-                  <a href="https://www.epa.gov/greenvehicles/greenhouse-gas-emissions-typical-passenger-vehicle#:~:text=typical%20passenger%20vehicle%3F-,A%20typical%20passenger%20vehicle%20emits%20about%204.6%20metric%20tons%20of,8%2C887%20grams%20of%20CO2.">
+                  <a
+                    className="text-ui-note no-underline hover:underline"
+                    href="https://www.epa.gov/greenvehicles/greenhouse-gas-emissions-typical-passenger-vehicle#:~:text=typical%20passenger%20vehicle%3F-,A%20typical%20passenger%20vehicle%20emits%20about%204.6%20metric%20tons%20of,8%2C887%20grams%20of%20CO2."
+                  >
                     EPA - Greenhouse Gas Emissions from a Typical Passenger Vehicle
                   </a>
                 </li>
                 <li>
-                  <a href="https://www.23degrees.com.au/blog/carbon-footprint-coffee-supply-chain/">
+                  <a
+                    className="text-ui-note no-underline hover:underline"
+                    href="https://www.23degrees.com.au/blog/carbon-footprint-coffee-supply-chain/"
+                  >
                     What is the carbon footprint of your cup of coffee?
                   </a>
                 </li>
@@ -527,7 +589,7 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
         </Section>
 
         <Section>
-          <Container className={`${styles.siteContainer}`} size="narrow">
+          <Container className={HERO_INNER} size="narrow">
 
             <SectionTitle as="h2">
               Here&apos;s a breakdown of your images...
@@ -541,7 +603,7 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
               Note: Images may appear cropped and optimized for display purposes only. Results are based on original full-sized images that are embedded in the page.
             </SectionText>
 
-            <ul className={styles.breakdownImages}>
+            <ul className="mt-16 list-none space-y-24 p-0">
               {activeImages && activeImages.map(image => {
 
                 const isImageAlreadyOptimized = image.original?.size <= image.optimized?.size + ALREADY_OPTIMIZED_SIZE_THRESHOLD;
@@ -551,9 +613,19 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
 
                 return (
                   <li key={image?.original.url}>
-                    <div className={styles.breakdownImage}>
-                      <div className={styles.breakdownVersions}>
-                        <div>
+                    <div
+                      className={cn(
+                        'grid w-full grid-cols-1 gap-8 min-[960px]:grid-cols-[7fr_3fr] min-[960px]:gap-8 lg:gap-12',
+                        optimizedBreakdownImage
+                      )}
+                    >
+                      <div
+                        className={cn(
+                          'm-0 grid grid-cols-1 gap-8 text-left sm:grid-cols-2 lg:gap-12',
+                          optimizedBreakdownVersions
+                        )}
+                      >
+                        <div className={breakdownVersionCard}>
                           {image?.uploaded?.url && (
                             <CldImage
                               key={image.uploaded.url}
@@ -566,7 +638,6 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                               loading="lazy"
                             />
                           )}
-                          {isImageAlreadyOptimized}
                           <p>
                             Format: { image.original?.format }
                           </p>
@@ -578,7 +649,7 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                           </p>
                         </div>
                         {!isSiteAlreadyOptimized && (
-                          <div>
+                          <div className={breakdownVersionCard}>
                             {image?.optimized?.url && (
                               <CldImage
                                 key={image.optimized.url}
@@ -603,7 +674,7 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                           </div>
                         )}
                       </div>
-                      <div className={styles.breakdownMeta}>
+                      <div className="text-left [&_h3]:mb-1 [&_h3]:text-[2em] [&_h3]:font-bold [&_ul]:m-0 [&_ul]:list-none [&_ul]:p-0">
                         {isImageAlreadyOptimized && (
                           <>
                             <h3>Nice work!</h3>
@@ -616,7 +687,7 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                           <>
                             <h3>You could save...</h3>
 
-                            <p className={styles.breakdownMetaSavings}>
+                            <p className="my-[0.2em] text-[2em] font-bold [&_strong]:text-brand-yellow">
                               <strong>{ formatBytes(estimatedSizeSavings, { limit: 1500 }) || '-' }</strong> = <strong>{ formatGrams(estimatedCarbonSavings, { fixed: 2, type: 'kg', limit: 1500 }) }</strong>
                             </p>
 
@@ -624,9 +695,9 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                               with { addCommas(requestsYearly) } yearly requests.
                             </p>
 
-                            <p className={styles.breakdownMetaBy}>By...</p>
+                            <p className="mt-[0.8em] text-[2em] font-bold [&_strong]:text-brand-yellow">By...</p>
 
-                            <ul className={styles.breakdownBetaSteps}>
+                            <ul className="mt-2 list-none p-0 text-[1.5em]">
                               <li>
                                 Optimizing Images
                               </li>
@@ -636,14 +707,14 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                       </div>
                     </div>
 
-                    <ul className={styles.breakdownUrls}>
-                      <li>
-                        <p>
+                    <ul className={breakdownUrlsList}>
+                      <li className="mb-2 grid last:mb-0">
+                        <p className="m-0 overflow-hidden text-ellipsis whitespace-nowrap">
                           Original: <a href={image?.original.url} title={image?.original.url}>{ image?.original.url }</a>
                         </p>
                       </li>
-                      <li>
-                        <p>
+                      <li className="mb-2 grid last:mb-0">
+                        <p className="m-0 overflow-hidden text-ellipsis whitespace-nowrap">
                           Optimized: <a href={image?.optimized.url} title={image?.optimized.url}>{ image?.optimized.url }</a>
                         </p>
                       </li>
@@ -658,7 +729,7 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
               </p>
             )}
             {typeof numberHiddenImages === 'number' && numberHiddenImages > 0 && (
-              <SectionText className={styles.breakdownHidden} size="tiny" color="note">
+              <SectionText className="mt-20" size="tiny" color="note">
                 <strong>{ numberHiddenImages }</strong> images not shown due to deduplication or smaller than { formatBytes(MIN_IMAGE_SIZE) } in size.
               </SectionText>
             )}
@@ -671,7 +742,7 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                 What you&apos;re doing right...
               </SectionTitle>
 
-              <ul className={styles.improvements}>
+              <ul className="m-0 list-none space-y-4 p-0">
                 {accomplishments && accomplishments.map(accomplishment => {
                   return (
                     <li key={accomplishment}>
@@ -693,7 +764,7 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                 What Else You Could be Doing...
               </SectionTitle>
 
-              <ul className={styles.improvements}>
+              <ul className="m-0 list-none space-y-4 p-0">
                 {improvements && improvements.map(improvement => {
                   return (
                     <li key={improvement}>
@@ -714,9 +785,13 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
               More Resources to Learn
             </SectionTitle>
 
-            <ul className={styles.resources}>
-              <li>
-                <a href="https://www.thegreenwebfoundation.org/" rel="noopener">
+            <ul className="my-12 grid list-none grid-cols-1 gap-8 px-12 md:grid-cols-3 md:px-0">
+              <li className="relative">
+                <a
+                  className="no-underline hover:underline"
+                  href="https://www.thegreenwebfoundation.org/"
+                  rel="noopener"
+                >
                   <CldImage
                     src="imagecarbon-assets/green-web-foundation_guapln"
                     width="800"
@@ -728,8 +803,12 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                   Towards a fossil free internet by 2030
                 </SectionText>
               </li>
-              <li>
-                <a href="https://almanac.httparchive.org/en/2022/sustainability#evaluating-the-environmental-impact-of-websites" rel="noopener">
+              <li className="relative">
+                <a
+                  className="no-underline hover:underline"
+                  href="https://almanac.httparchive.org/en/2022/sustainability#evaluating-the-environmental-impact-of-websites"
+                  rel="noopener"
+                >
                   <CldImage
                     src="imagecarbon-assets/http-archive-sustainability_ynumgy"
                     width="800"
@@ -741,8 +820,11 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                   Environmental impact of websites
                 </SectionText>
               </li>
-              <li>
-                <a href="https://cloudinary.com/state-of-visual-media-report?going-green&utm_source=imagecarbon.com&utm_medium=referral&utm_campaign=devx_imagecarbon&utm_content=stateofvisualmedia">
+              <li className="relative">
+                <a
+                  className="no-underline hover:underline"
+                  href="https://cloudinary.com/state-of-visual-media-report?going-green&utm_source=imagecarbon.com&utm_medium=referral&utm_campaign=devx_imagecarbon&utm_content=stateofvisualmedia"
+                >
                   <CldImage
                     src="imagecarbon-assets/state-of-visual-media_zrpykz"
                     width="800"

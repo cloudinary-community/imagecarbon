@@ -1,18 +1,17 @@
 import { forwardRef } from 'react';
 
-import styles from './Section.module.scss';
+import { cn } from '@/lib/cn';
 
 const Section = forwardRef(function Section(props, ref) {
   const { children, className, backgroundColor, ...rest } = props;
 
-  let sectionClassName = styles.section;
-
-  if (className) {
-    sectionClassName = `${sectionClassName} ${className}`;
-  }
-
   return (
-    <section ref={ref} className={sectionClassName} data-background-color={backgroundColor} {...rest}>
+    <section
+      ref={ref}
+      className={cn('my-20 py-4 md:my-20 md:py-8', className)}
+      data-background-color={backgroundColor}
+      {...rest}
+    >
       {children}
     </section>
   );

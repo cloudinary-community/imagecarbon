@@ -13,8 +13,7 @@ import Container from '@/components/Container';
 import SectionTitle from '@/components/SectionTitle';
 import SectionText from '@/components/SectionText';
 import FormSubmitWebsite from '@/components/FormSubmitWebsite';
-
-import styles from '@/styles/Site.module.scss'
+import { HERO_GLOW_LOADING, HERO_INNER } from '@/lib/heroClasses';
 
 export default function Site() {
   const router = useRouter();
@@ -34,7 +33,7 @@ export default function Site() {
       log('[Site] No URL, redirecting to home');
       router.push('/');
     }
-  }, [router.isReady, url]);
+  }, [router, router.isReady, url]);
 
   useEffect(() => {
     log('[Site] Checking if scraping complete', { isComplete, error, siteUrl });
@@ -42,7 +41,7 @@ export default function Site() {
     const redirect = cleanUrl(siteUrl);
     log(`[Site] Scraping complete, redirecting to: ${redirect}`);
     router.replace(`/sites/${encodeURIComponent(redirect)}`);
-  }, [ isComplete, error, siteUrl])
+  }, [router, isComplete, error, siteUrl]);
 
   return (
     <Layout>
@@ -54,8 +53,8 @@ export default function Site() {
       </Head>
 
       {!error && (
-        <Section className={`${styles.siteHeroSection} ${styles.siteHeroSectionLoading}`}>
-          <Container className={styles.siteContainer} size="narrow">
+        <Section className={HERO_GLOW_LOADING}>
+          <Container className={HERO_INNER} size="narrow">
             <SectionTitle>
               Scanning your site!
             </SectionTitle>

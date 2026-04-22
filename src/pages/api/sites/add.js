@@ -1,8 +1,24 @@
 import { cleanUrl } from '@/lib/util';
 import { getSiteByUrl, updateSiteById, createSite, getImagesBySiteUrl, deleteImagesById, addImages } from '@/lib/sites-server';
 
+function readJsonBody(req) {
+  const raw = req.body;
+  if (raw == null) return null;
+  if (typeof raw === 'string') {
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return null;
+    }
+  }
+  return raw;
+}
+
 export default async function handler(req, res) {
-  const body = JSON.parse(req.body);
+  const body = readJsonBody(req);
+  if (!body || !Array.isArray(body.images) || typeof body.siteUrl !== 'string') {
+    return res.status(400).json({ error: 'Invalid request body' });
+  }
   const { images, screenshot } = body;
   const siteUrl = cleanUrl(body.siteUrl);
   

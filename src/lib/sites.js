@@ -3,38 +3,40 @@
  */
 
 export async function collectImageStats({ images, siteUrl }) {
-  try {
-    const results = await fetch('/api/collect', {
-      method: 'POST',
-      body: JSON.stringify({
-        images,
-        siteUrl
-      })
-    }).then(r => r.json());
-    return results;
-  } catch(e) {
-    throw new Error(`Failed to add site: ${e.message}`);
+  const res = await fetch('/api/collect', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      images,
+      siteUrl
+    })
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(data.error || `Collect failed (${res.status})`);
   }
+  return data;
 }
 
 /**
  * addSite
  */
 
-export async function addSite({ images, siteUrl,screenshot }) {
-  try {
-    const results = await fetch('/api/sites/add', {
-      method: 'POST',
-      body: JSON.stringify({
-        images,
-        siteUrl,
-        screenshot
-      })
-    }).then(r => r.json());
-    return results;
-  } catch(e) {
-    throw new Error(`Failed to add site: ${e.message}`);
+export async function addSite({ images, siteUrl, screenshot }) {
+  const res = await fetch('/api/sites/add', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      images,
+      siteUrl,
+      screenshot
+    })
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(data.error || `Save site failed (${res.status})`);
   }
+  return data;
 }
 
 /**
@@ -42,12 +44,13 @@ export async function addSite({ images, siteUrl,screenshot }) {
  */
 
 export async function getCache({ siteUrl }) {
-  try {
-    const results = await fetch(`/api/sites/cache?url=${siteUrl}`).then(r => r.json());
-    return results;
-  } catch(e) {
-    throw new Error(`Failed get cache: ${e.message}`);
+  const encoded = encodeURIComponent(siteUrl);
+  const res = await fetch(`/api/sites/cache?url=${encoded}`);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(data.error || `Cache lookup failed (${res.status})`);
   }
+  return data;
 }
 
 /**
@@ -55,10 +58,11 @@ export async function getCache({ siteUrl }) {
  */
 
 export async function clearCache({ siteUrl }) {
-  try {
-    const results = await fetch(`/api/sites/refresh?url=${siteUrl}`).then(r => r.json());
-    return results;
-  } catch(e) {
-    throw new Error(`Failed get cache: ${e.message}`);
+  const encoded = encodeURIComponent(siteUrl);
+  const res = await fetch(`/api/sites/refresh?url=${encoded}`);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(data.error || `Refresh failed (${res.status})`);
   }
+  return data;
 }

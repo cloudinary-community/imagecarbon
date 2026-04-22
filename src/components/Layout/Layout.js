@@ -1,19 +1,23 @@
 import Head from 'next/head';
-import { CldOgImage } from 'next-cloudinary'
+import { CldOgImage } from 'next-cloudinary';
 
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
-import styles from './Layout.module.scss';
-
 const Layout = ({ children }) => {
   return (
-    <div className={styles.layout}>
+    <div className="grid min-h-screen grid-rows-[auto_1fr_auto] overflow-hidden">
       <Head>
-      <title>Image Carbon - Optimize Images, Save the Planet</title>
-        <meta name="description" content="Reduce your carbon footprint with Image Carbon! Learn how image optimization can lower carbon emissions and make a sustainable web." />
+        <title>Image Carbon - Optimize Images, Save the Planet</title>
+        <meta
+          name="description"
+          content="Reduce your carbon footprint with Image Carbon! Learn how image optimization can lower carbon emissions and make a sustainable web."
+        />
         <meta name="og:title" content="Optimize Images, Save the Planet with Image Carbon" />
-        <meta name="og:description" content="Reduce your carbon footprint with Image Carbon! Learn how image optimization can lower carbon emissions and make a sustainable web." />
+        <meta
+          name="og:description"
+          content="Reduce your carbon footprint with Image Carbon! Learn how image optimization can lower carbon emissions and make a sustainable web."
+        />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
@@ -32,7 +36,7 @@ const Layout = ({ children }) => {
       />
 
       <Header />
-      <main className={styles.main}>{children}</main>
+      <main className="pb-12">{children}</main>
       <Footer />
     </div>
   );
