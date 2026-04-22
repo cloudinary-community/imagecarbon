@@ -30,7 +30,7 @@ const Layout = ({ children }) => {
       </Head>
 
       <CldOgImage
-        src="imagecarbon-assets/og-default-2400x1200_f9irn4"
+        src="og-default-2400x1200_f9irn4_nudfxt"
         alt="How much carbon are you producing with your website images? ImageCarbon.com"
         twitterTitle="Optimize Images, Save the Planet with Image Carbon"
       />

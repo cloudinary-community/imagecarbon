@@ -195,7 +195,7 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
 
       {isSiteAlreadyOptimized && (
         <CldOgImage
-          src="imagecarbon-assets/og-optimized-2400x1200_q2urz1"
+          src="og-optimized-2400x1200_q2urz1_bpdksw"
           alt="How much carbon are you producing with your website images? ImageCarbon.com"
           twitterTitle="Optimize Images, Save the Planet with Image Carbon"
           overlays={[
@@ -240,7 +240,7 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
 
       {!isSiteAlreadyOptimized && (
         <CldOgImage
-          src="imagecarbon-assets/og-blank-2400x1200_henniw"
+          src="og-blank-2400x1200_henniw_hkh32h"
           alt="How much carbon are you producing with your website images? ImageCarbon.com"
           twitterTitle="Optimize Images, Save the Planet with Image Carbon"
           overlays={[
@@ -793,7 +793,7 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                   rel="noopener"
                 >
                   <CldImage
-                    src="imagecarbon-assets/green-web-foundation_guapln"
+                    src="green-web-foundation_guapln_dzkjbv"
                     width="800"
                     height="600"
                     alt="The Green Web Foundation"
@@ -810,7 +810,7 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                   rel="noopener"
                 >
                   <CldImage
-                    src="imagecarbon-assets/http-archive-sustainability_ynumgy"
+                    src="http-archive-sustainability_ynumgy_lins7b"
                     width="800"
                     height="600"
                     alt="Rainforest with results as JPEG"
@@ -826,7 +826,7 @@ export default function Site({ siteUrl: url, images: siteImages, dateCollected: 
                   href="https://cloudinary.com/state-of-visual-media-report?going-green&utm_source=imagecarbon.com&utm_medium=referral&utm_campaign=devx_imagecarbon&utm_content=stateofvisualmedia"
                 >
                   <CldImage
-                    src="imagecarbon-assets/state-of-visual-media_zrpykz"
+                    src="state-of-visual-media_zrpykz_axsxde"
                     width="800"
                     height="600"
                     alt="Cloudinary State of Visual Media"
